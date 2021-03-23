@@ -16,7 +16,7 @@ beam_width = 40;
 
 //! Y-Axis assembly
 module y_axis_assembly()
-assembly("y-axis") {
+assembly("y_axis") {
   x_length = 2400;
   y_length = 300;
   travel_distance = 600;

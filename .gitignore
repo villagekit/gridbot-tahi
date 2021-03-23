@@ -1,0 +1,10 @@
+*.log
+*.echo
+/assemblies/
+/bom
+/dxfs/
+/printme.html
+/readme.html
+/readme.md
+/scad/bom.scad
+/stls/
