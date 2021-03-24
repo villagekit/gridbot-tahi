@@ -1,11 +1,8 @@
 *.log
 *.echo
 times.txt
-/assemblies/
+bounds.json
+deps
+*.deps
 /bom
-/dxfs/deps
-/printme.html
-/readme.html
-/readme.md
 /scad/bom.scad
-/stls/deps

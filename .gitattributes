@@ -1,3 +1,6 @@
 *.png filter=lfs diff=lfs merge=lfs -text
 *.dxf filter=lfs diff=lfs merge=lfs -text
 *.stl filter=lfs diff=lfs merge=lfs -text
+readme.html filter=lfs diff=lfs merge=lfs -text
+printme.html filter=lfs diff=lfs merge=lfs -text
+readme.md filter=lfs diff=lfs merge=lfs -text
