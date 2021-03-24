@@ -21,6 +21,7 @@
 include <NopSCADlib/core.scad>
 include <NopSCADlib/vitamins/extrusions.scad>
 include <NopSCADlib/vitamins/rails.scad>
+include <NopSCADlib/vitamins/sheets.scad>
 include <NopSCADlib/vitamins/stepper_motors.scad>
 
 //                Wr  Hr    E     P   D    d    h                                       go?   gw?
@@ -31,28 +32,29 @@ HGH20HA_carriage  = [ 92.2, 65.2, 44, 30, 4.6, 50,  32, M5_cap_screw, HGH20 ];
 
 use <NopSCADlib/vitamins/extrusion.scad>
 use <NopSCADlib/vitamins/rail.scad>
+use <NopSCADlib/vitamins/sheet.scad>
 use <NopSCADlib/vitamins/stepper_motor.scad>
 
 beam_width = 40;
-plate_thickness = 3;
+sheet = AL8;
+stepper = NEMA23;
 
-//! A NEMA23 motor mount plate.
+//! A stepper motor mount plate.
 //! 
-//! Similar to [PLATE-MOTOR-NEMA23-V2](https://www.makerstore.com.au/product/motor-mount-plate-nema23/), but this design is more appropriate for our machine and covers the extrusion ends.
+//! Similar to [PLATE-MOTOR-stepper-V2](https://www.makerstore.com.au/product/motor-mount-plate-nema23/), but this design is more appropriate for our machine and covers the extrusion ends.
 module motor_mount_dxf() {
   dxf("motor_mount");
 
-  linear_extrude(plate_thickness)
   union() {
   
-    translate([2 * NEMA_body_radius(NEMA23), (3 / 2) * beam_width])
+    translate([2 * NEMA_body_radius(stepper), (3 / 2) * beam_width])
     difference() {
       scale(1.2)
-      NEMA_outline(NEMA23);
+      NEMA_outline(stepper);
 
-      circle(NEMA_big_hole(NEMA23));
+      circle(NEMA_big_hole(stepper));
 
-      NEMA_screw_positions(NEMA23) {
+      NEMA_screw_positions(stepper) {
         circle(M5_clearance_radius);
       }
     }
@@ -115,23 +117,24 @@ assembly("x_axis") {
   rail(HGH20, travel_distance);
 
   // motor: x-start, y-start
-  translate([-plate_thickness, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA23)])
+  translate([-sheet_thickness(sheet), (3 / 2) * beam_width, 2 * NEMA_body_radius(stepper)])
   rotate([0, 90, 0])
-  NEMA(NEMA23);
+  NEMA(stepper);
 
   // motor mount: x-start, y-start
+  translate([-(1 / 2) * sheet_thickness(sheet), 0, 0])
   rotate([0, -90, 0])
-  motor_mount_dxf();
+  render_2D_sheet(sheet) motor_mount_dxf();
 
   // motor: x-start, y-end
-  translate([-plate_thickness, y_length - (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA23)])
+  translate([-sheet_thickness(sheet), y_length - (3 / 2) * beam_width, 2 * NEMA_body_radius(stepper)])
   rotate([0, 90, 0])
-  NEMA(NEMA23);
+  NEMA(stepper);
 
   // motor mount: x-start, y-end
-  translate([-plate_thickness, y_length, 0])
+  translate([-(1 / 2) * sheet_thickness(sheet), y_length, 0])
   rotate([180, -90, 0])
-  motor_mount_dxf();
+  render_2D_sheet(sheet) motor_mount_dxf();
 }
 
 //! Main assembly
