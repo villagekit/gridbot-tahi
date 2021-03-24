@@ -1,4 +1,22 @@
-//! Grid Bot
+//
+// NopSCADlib Copyright Chris Palmer 2018
+// GridBot Copyright Michael Williams 2021
+//
+// This file is licensed under the GPL-3.0 license, as with NopSCADlib.
+//
+// NopSCADlib is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of
+// the License, or (at your option) any later version.
+//
+// NopSCADlib is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with NopSCADlib.
+// If not, see <https://www.gnu.org/licenses/>.
+//
+
+//! A multi-spindle single-axis CNC.
 
 include <NopSCADlib/core.scad>
 include <NopSCADlib/vitamins/extrusions.scad>
@@ -18,7 +36,9 @@ use <NopSCADlib/vitamins/stepper_motor.scad>
 beam_width = 40;
 plate_thickness = 3;
 
-//! Motor mount
+//! A NEMA23 motor mount plate.
+//! 
+//! Similar to [PLATE-MOTOR-NEMA23-V2](https://www.makerstore.com.au/product/motor-mount-plate-nema23/), but this design is more appropriate for our machine and covers the extrusion ends.
 module motor_mount_dxf() {
   dxf("motor_mount");
 
@@ -49,7 +69,9 @@ module motor_mount_dxf() {
   }
 }
 
-//! X-Axis assembly
+//! This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
+//! 
+//! The necessary X-axis travel distance is equal to the total length divided by the number of spindles, so 2400mm / 6 spindles = 400mm / spindle, so the X-axis linear actuator needs to be able to move at least 400mm.
 module x_axis_assembly()
 assembly("x_axis") {
   x_length = 2400;
@@ -93,12 +115,22 @@ assembly("x_axis") {
   rail(HGH20, travel_distance);
 
   // motor: x-start, y-start
-  translate([-plate_thickness, (3 / 2) * beam_width,2 * NEMA_body_radius(NEMA23)])
+  translate([-plate_thickness, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA23)])
   rotate([0, 90, 0])
   NEMA(NEMA23);
 
   // motor mount: x-start, y-start
   rotate([0, -90, 0])
+  motor_mount_dxf();
+
+  // motor: x-start, y-end
+  translate([-plate_thickness, y_length - (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA23)])
+  rotate([0, 90, 0])
+  NEMA(NEMA23);
+
+  // motor mount: x-start, y-end
+  translate([-plate_thickness, y_length, 0])
+  rotate([180, -90, 0])
   motor_mount_dxf();
 }
 
