@@ -22,9 +22,11 @@ A multi-spindle single-axis CNC.
 |  | | **Vitamins** |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 140mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 2400mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Leadscrew 8 x 700mm, 8mm lead, 4 starts |
 | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Linear rail HGH20 x 600mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Shaft coupling SC_635x8_rigid |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 51.2mm |
-| &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;14&nbsp; | &nbsp;&nbsp;14&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **CNC routed parts** |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;motor_mount.dxf |
 | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;Total CNC routed parts count |
@@ -40,7 +42,9 @@ A multi-spindle single-axis CNC.
 |---:|:----------|
 |2| Extrusion E4080 x 140mm|
 |2| Extrusion E4080 x 2400mm|
+|2| Leadscrew 8 x 700mm, 8mm lead, 4 starts|
 |4| Linear rail HGH20 x 600mm|
+|2| Shaft coupling SC_635x8_rigid|
 |2| Stepper motor NEMA22 x 51.2mm|
 
 
