@@ -18,6 +18,8 @@
 
 //! A multi-spindle single-axis CNC.
 
+EPS = 0.001;
+
 include <NopSCADlib/core.scad>
 include <NopSCADlib/vitamins/ball_bearings.scad>
 include <NopSCADlib/vitamins/extrusions.scad>
@@ -99,13 +101,39 @@ module motor_mount_dxf() {
 }
 
 //! A support seat block designed to support a leadscrew (with a bearing) and a rail.
+//!
+//! TODO fix the design
 module support_seat_stl() {
-  stl("leadnut_block");
+  stl("support_seat");
 
   difference() {
-    cube([beam_width, beam_width * 2, 60]);
+    union() {
+      translate([0, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
+      rotate([0, 90, 0])
+      cylinder(
+        h = (1 / 2) * beam_width,
+        d = beam_width
+      );
 
+      cube([(1 / 2) * beam_width, 2 * beam_width, (1 / 2) * beam_width]);
 
+      translate([0, beam_width, 0])
+      cube([beam_width, beam_width, (1 / 2) * beam_width]);
+    }
+
+    translate([-EPS, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
+    rotate([0, 90, 0])
+    cylinder(
+      h = beam_width + 2 * EPS,
+      d = bb_diameter(leadscrew_bearing)
+    );
+    
+    translate([-EPS, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
+    rotate([0, 90, 0])
+    cylinder(
+      h = beam_width + 2 * EPS,
+      d = bb_diameter(leadscrew_bearing)
+    );
   }
 }
 
@@ -145,18 +173,39 @@ module x_axis_lead_assembly() {
   rotate([0, 90, 0])
   leadscrew(leadscrew_diameter, x_axis_leadscrew_length, leadscrew_lead, leadscrew_starts); 
 
+  // first support seat
+  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance), 0, beam_width])
+  support_seat_stl();
+
+  // first, first bearing
+  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance + bb_width(leadscrew_bearing)), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
+  rotate([0, 90, 0])
+  ball_bearing(leadscrew_bearing);
+
+  // first, second bearing
+  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance - bb_width(leadscrew_bearing) + beam_width), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
+  rotate([0, 90, 0])
+  ball_bearing(leadscrew_bearing);
+
+  // second support seat
+  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (3 / 4) * beam_width, 0, beam_width])
+  support_seat_stl();
+
+  // second, first bearing
+  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (3 / 4) * beam_width + (1 / 2) * bb_width(leadscrew_bearing), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
+  rotate([0, 90, 0])
+  ball_bearing(leadscrew_bearing);
+
+  // second, second bearing
+  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (1 / 4) * beam_width - (1 / 2) * bb_width(leadscrew_bearing), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
+  rotate([0, 90, 0])
+  ball_bearing(leadscrew_bearing);
 }
 
 module x_axis_rail_assembly() {
   // rail
-  translate([(1 / 2) * x_axis_travel_distance + (x_axis_leadscrew_length - x_axis_travel_distance), (1 / 2) * beam_width, beam_width])
+  translate([(1 / 2) * x_axis_travel_distance + 2 * beam_width, (1 / 2) * beam_width, beam_width])
   rail(HGH20, x_axis_travel_distance);
-
-  /*
-  // support seat
-  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance), 0, beam_width])
-  support_seat_stl();
-  */
 }
 
 //! This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
