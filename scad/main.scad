@@ -17,6 +17,10 @@
 //
 
 //! A multi-spindle single-axis CNC.
+//!
+//! For the framing, we'll use 8040 aluminium extrusion since it's fit for purpose and readily available here in New Zealand.
+//!
+//! Where possible, we'll try to use motion control components found in "pro" consumer CNC machines (AvidCNC, RoverCNC, QueenBee, etc), e.g. stepper motors, lead screws, linear rails, etc.
 
 EPS = 0.001;
 
@@ -55,18 +59,21 @@ use <NopSCADlib/vitamins/stepper_motor.scad>
 
 beam_width = 40;
 NEMA_type = NEMA23;
-shaft_coupling_type = SC_635x8_rigid;
 leadnut_type = LSN8x8;
 leadscrew_diameter = 8;
 leadscrew_lead = 8;
 leadscrew_starts = 4;
 leadscrew_bearing = BB688ZZ;
+rail_type = HGH20;
+shaft_coupling_type = SC_635x8_rigid;
 sheet_type = AL8;
 
 x_axis_x_length = 2400;
 x_axis_y_length = 300;
 x_axis_travel_distance = 600;
 x_axis_leadscrew_length = 700;
+
+drill_z_length = 200;
 
 //! A NEMA_type motor mount plate.
 //! 
@@ -205,7 +212,7 @@ module x_axis_lead_assembly() {
 module x_axis_rail_assembly() {
   // rail
   translate([(1 / 2) * x_axis_travel_distance + 2 * beam_width, (1 / 2) * beam_width, beam_width])
-  rail(HGH20, x_axis_travel_distance);
+  rail(rail_type, x_axis_travel_distance);
 }
 
 //! This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
@@ -261,10 +268,36 @@ assembly("x_axis") {
   }
 }
 
+//! This assembly is for a gang of drills on a frame.
+//!
+//! The number of drills should be a divisor of the total number of holes per beam (60). So we might start with 6 drills, so 10 holes to be drilled per drill.
+module gang_drill_assembly()
+assembly("drill_gang") {
+  drill_assembly();
+};
+
+//! This assembly is for a drill.
+//!
+//! Each drill has independent spindle and an independent Z-axis.
+module drill_assembly()
+assembly("drill") {
+  translate([(1 / 2) * beam_width, (1 / 2) * beam_width, (1 / 2) * drill_z_length])
+  extrusion(E4040, drill_z_length);
+
+  translate([beam_width, (1 / 2) * beam_width, (1 / 2) * drill_z_length])
+  rotate([0, 90, 0])
+  rail(rail_type, drill_z_length);
+
+  translate([0, (1 / 2) * beam_width, (1 / 2) * drill_z_length])
+  rotate([0, -90, 0])
+  rail(rail_type, drill_z_length);
+};
+
 //! Main assembly
 module main_assembly()
 assembly("main") {
-  x_axis_assembly();
+  // x_axis_assembly();
+  gang_drill_assembly();
 }
 
 if($preview)
