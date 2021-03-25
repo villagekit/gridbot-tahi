@@ -17,6 +17,10 @@
 //
 
 //! A multi-spindle single-axis CNC.
+//!
+//! For the framing, we'll use 8040 aluminium extrusion since it's fit for purpose and readily available here in New Zealand.
+//!
+//! Where possible, we'll try to use motion control components found in "pro" consumer CNC machines (AvidCNC, RoverCNC, QueenBee, etc), e.g. stepper motors, lead screws, linear rails, etc.
 
 EPS = 0.001;
 
@@ -55,12 +59,13 @@ use <NopSCADlib/vitamins/stepper_motor.scad>
 
 beam_width = 40;
 NEMA_type = NEMA23;
-shaft_coupling_type = SC_635x8_rigid;
 leadnut_type = LSN8x8;
 leadscrew_diameter = 8;
 leadscrew_lead = 8;
 leadscrew_starts = 4;
 leadscrew_bearing = BB688ZZ;
+rail_type = HGH20;
+shaft_coupling_type = SC_635x8_rigid;
 sheet_type = AL8;
 
 x_axis_x_length = 2400;
@@ -68,11 +73,16 @@ x_axis_y_length = 300;
 x_axis_travel_distance = 600;
 x_axis_leadscrew_length = 700;
 
-//! A NEMA_type motor mount plate.
-//! 
-//! Similar to [PLATE-MOTOR-NEMA_type-V2](https://www.makerstore.com.au/product/motor-mount-plate-nema23/), but this design is more appropriate for our machine and covers the extrusion ends.
-module motor_mount_dxf() {
-  dxf("motor_mount");
+drill_z_length = 200;
+
+gang_z_length = 400;
+gang_y_length = x_axis_y_length + 2 * beam_width;
+gang_x_length = x_axis_x_length;
+gang_drill_count = 6;
+
+//! A NEMA_type motor mount plate for the y-axis.
+module x_axis_motor_mount_dxf() {
+  dxf("x_axis_motor_mount");
 
   union() {
   
@@ -95,6 +105,37 @@ module motor_mount_dxf() {
       circle(M8_clearance_radius);
 
       translate([(1 / 2) * beam_width, 2.5 * beam_width])
+      circle(M8_clearance_radius);
+    }
+  }
+}
+
+//! A NEMA_type motor mount plate for the z-axis.
+module z_axis_motor_mount_dxf() {
+  dxf("z_axis_motor_mount");
+
+  union() {
+  
+    translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width])
+    difference() {
+      scale(1.2)
+      NEMA_outline(NEMA_type);
+
+      circle(NEMA_big_hole(NEMA_type));
+
+      NEMA_screw_positions(NEMA_type) {
+        circle(M5_clearance_radius);
+      }
+    }
+
+    difference() {
+      translate([0, -beam_width])
+      square([beam_width, 2 * beam_width]);
+
+      translate([(1 / 2) * beam_width, 0.5 * beam_width])
+      circle(M8_clearance_radius);
+
+      translate([(1 / 2) * beam_width, -0.5 * beam_width])
       circle(M8_clearance_radius);
     }
   }
@@ -160,7 +201,7 @@ module x_axis_lead_assembly() {
   // motor mount
   translate([-(1 / 2) * sheet_thickness(sheet_type), 0, 0])
   rotate([0, -90, 0])
-  render_2D_sheet(sheet_type) motor_mount_dxf();
+  render_2D_sheet(sheet_type) x_axis_motor_mount_dxf();
 
   // shaft coupling
   x_axis_lead_shaft_coupling_x = NEMA_shaft_length(NEMA_type) - sheet_thickness(sheet_type);
@@ -205,7 +246,7 @@ module x_axis_lead_assembly() {
 module x_axis_rail_assembly() {
   // rail
   translate([(1 / 2) * x_axis_travel_distance + 2 * beam_width, (1 / 2) * beam_width, beam_width])
-  rail(HGH20, x_axis_travel_distance);
+  rail(rail_type, x_axis_travel_distance);
 }
 
 //! This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
@@ -216,22 +257,22 @@ assembly("x_axis") {
   // extrusion: y-length, at x-start
   translate([beam_width, x_axis_y_length / 2, (1 / 2) * beam_width])
   rotate([90, 90, 0])
-  extrusion(E4080, x_axis_y_length - 4 * beam_width, cornerHole = true);
+  extrusion(E4080, x_axis_y_length - 4 * beam_width);
 
   // extrusion: y-length, at x-end
   translate([x_axis_x_length - beam_width, x_axis_y_length / 2, (1 / 2) * beam_width])
   rotate([90, 90, 0])
-  extrusion(E4080, x_axis_y_length - 4 * beam_width, cornerHole = true);
+  extrusion(E4080, x_axis_y_length - 4 * beam_width);
 
   // extrusion: x-length, at y-start
   translate([x_axis_x_length / 2, beam_width, (1 / 2) * beam_width])
   rotate([0, 90, 0])
-  extrusion(E4080, x_axis_x_length, cornerHole = true);
+  extrusion(E4080, x_axis_x_length);
 
   // extrusion: x-length, at y-end
   translate([x_axis_x_length / 2, beam_width + x_axis_y_length - 2 * beam_width, (1 / 2) * beam_width])
   rotate([0, 90, 0])
-  extrusion(E4080, x_axis_x_length, cornerHole = true);
+  extrusion(E4080, x_axis_x_length);
 
   // x-start, y-start
   x_axis_rail_assembly();
@@ -261,10 +302,95 @@ assembly("x_axis") {
   }
 }
 
+//! This assembly is for a gang of drills on a frame.
+//!
+//! The number of drills should be a divisor of the total number of holes per beam (60). So we might start with 6 drills, so 10 holes to be drilled per drill.
+module gang_drill_assembly()
+assembly("gang_drill") {
+  gang_z_frame_length = gang_z_length - 2 * beam_width;
+  gang_y_frame_length = gang_y_length - 2 * beam_width;
+
+
+  // frame: x-length, y-start
+  translate([(1 / 2) * gang_x_length, -(1 / 2) * beam_width, gang_z_length - beam_width])
+  rotate([90, 0, 0])
+  rotate([0, 90, 0])
+  extrusion(E4080, gang_x_length);
+
+  translate([(1 / 2) * gang_x_length, gang_y_length - (3 / 2) * beam_width, gang_z_length - beam_width])
+  rotate([90, 0, 0])
+  rotate([0, 90, 0])
+  extrusion(E4080, gang_x_length);
+
+  for (i = [0 : gang_drill_count]) {
+    x_offset = i < gang_drill_count
+      ? i * (x_axis_x_length / gang_drill_count)
+      : i * (x_axis_x_length / gang_drill_count) - 2 * beam_width;
+
+    translate([x_offset, 0, 0]) {
+      // frame: z-length, y-start
+      translate([beam_width, -(1 / 2) * beam_width, (1 / 2) * gang_z_frame_length])
+      rotate([0, 0, 90])
+      extrusion(E4080, gang_z_frame_length);
+
+      // frame: z-length, y-end
+      translate([beam_width, x_axis_y_length + (1 / 2) * beam_width, (1 / 2) * gang_z_frame_length])
+      rotate([0, 0, 90])
+      extrusion(E4080, gang_z_frame_length);
+      // frame: y-length
+      translate([(1 / 2) * beam_width, (1 / 2) * gang_y_length - beam_width, gang_z_length - beam_width])
+      rotate([90, 0, 0])
+      extrusion(E4080, gang_y_frame_length);
+
+      if (i < gang_drill_count) {
+        translate([4 * beam_width, (1 / 2) * gang_y_length - 2 * beam_width, (1 / 2) * gang_z_length])
+        rotate([0, 0, 180])
+        drill_assembly();
+      }
+    }
+  }
+};
+
+//! This assembly is for a drill.
+//!
+//! Each drill has independent spindle and an independent Z-axis.
+module drill_assembly()
+assembly("drill") {
+  drill_leadscrew_length = drill_z_length + sheet_thickness(sheet_type) - NEMA_shaft_length(NEMA_type);
+
+  // frame
+  translate([(1 / 2) * beam_width, 0, (1 / 2) * drill_z_length])
+  extrusion(E4080, drill_z_length);
+
+  // rail
+  translate([beam_width, -(1 / 2) * beam_width, (1 / 2) * drill_z_length])
+  rotate([0, 90, 0])
+  rail(rail_type, drill_z_length);
+
+  // motor
+  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, drill_z_length + sheet_thickness(sheet_type)])
+  rotate([0, 180, 0])
+  NEMA(NEMA_type);
+
+  // motor mount
+  translate([0, 0, drill_z_length + (1 / 2) * sheet_thickness(sheet_type)])
+  render_2D_sheet(sheet_type) z_axis_motor_mount_dxf();
+
+  // shaft coupling
+  x_axis_lead_shaft_coupling_x = NEMA_shaft_length(NEMA_type) - sheet_thickness(sheet_type);
+  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, drill_z_length + sheet_thickness(sheet_type) - NEMA_shaft_length(NEMA_type)])
+  shaft_coupling(shaft_coupling_type);
+
+  // leadscrew
+  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, (1 / 2) * drill_leadscrew_length])
+  leadscrew(leadscrew_diameter, drill_leadscrew_length, leadscrew_lead, leadscrew_starts); 
+};
+
 //! Main assembly
 module main_assembly()
 assembly("main") {
   x_axis_assembly();
+  gang_drill_assembly();
 }
 
 if($preview)
