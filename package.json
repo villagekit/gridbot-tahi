@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rm -rf assemblies bom dxfs openscad.* printme.html readme.html readme.md stls tmp",
     "dev": "OPENSCADPATH=$(pwd) openscad scad/main.scad",
-    "build": "OPENSCADPATH=$(pwd) ./NopSCADlib/scripts/make_all.py"
+    "build": "OPENSCADPATH=$(pwd) python3 ./NopSCADlib/scripts/make_all.py"
   },
   "repository": {
     "type": "git",
