@@ -1,3 +1,404 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8d63bf13e9ce2c940e999db44e0bf2b61e235bf8fdc9ce1bb4ccccab9c2b6246
-size 12113
+<p><a name="TOP"></a></p>
+<h1>Grid-bot</h1>
+<p>A multi-spindle single-axis CNC.</p>
+<p>For the framing, we'll use 8040 aluminium extrusion since it's fit for purpose and readily available here in New Zealand.</p>
+<p>Where possible, we'll try to use motion control components found in "pro" consumer CNC machines (AvidCNC, RoverCNC, QueenBee, etc), e.g. stepper motors, lead screws, linear rails, etc.</p>
+<p><img alt="Main Assembly" src="assemblies/main_assembled.png" /></p>
+<p><span></span></p>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#Parts_list">Parts list</a></li>
+<li><a href="#drill_assembly">Drill Assembly</a></li>
+<li><a href="#gang_drill_assembly">Gang Drill Assembly</a></li>
+<li><a href="#x_axis_assembly">X Axis Assembly</a></li>
+<li><a href="#main_assembly">Main Assembly</a></li>
+</ol>
+<p><span></span>
+<a href="#TOP">Top</a></p>
+<hr />
+<p><a name="Parts_list"></a></p>
+<h2>Parts list</h2>
+<table>
+<thead>
+<tr>
+<th align="right"><span style="writing-mode: vertical-rl; text-orientation: mixed;">6 x Drill</span></th>
+<th align="right"><span style="writing-mode: vertical-rl; text-orientation: mixed;">Gang&nbsp;Drill</span></th>
+<th align="right"><span style="writing-mode: vertical-rl; text-orientation: mixed;">X&nbsp;Axis</span></th>
+<th align="right"><span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span></th>
+<th align="right"><span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="left"><strong>Vitamins</strong></td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;8&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;8&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Ball bearing 688ZZZZ 8mm x 16mm x 5mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E4080 x 140mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E4080 x 200mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E4080 x 2400mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;7&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;7&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E4080 x 300mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;14&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;14&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E4080 x 320mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Leadscrew 8 x 184mm, 8mm lead, 4 starts</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Leadscrew 8 x 700mm, 8mm lead, 4 starts</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Linear rail HGH20 x 200mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Linear rail HGH20 x 600mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;8&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Shaft coupling SC_635x8_rigid</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;8&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Stepper motor NEMA22 x 51.2mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;30&nbsp;</td>
+<td align="right">&nbsp;&nbsp;23&nbsp;</td>
+<td align="right">&nbsp;&nbsp;22&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;75&nbsp;</td>
+<td align="left">&nbsp;&nbsp;Total vitamins count</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="left"><strong>3D printed parts</strong></td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="left">&nbsp;&nbsp;support_seat.stl</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;4&nbsp;</td>
+<td align="left">&nbsp;&nbsp;Total 3D printed parts count</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="left"><strong>CNC routed parts</strong></td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="left">&nbsp;&nbsp;x_axis_motor_mount.dxf</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp;z_axis_motor_mount.dxf</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;2&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;8&nbsp;</td>
+<td align="left">&nbsp;&nbsp;Total CNC routed parts count</td>
+</tr>
+</tbody>
+</table>
+<p><span></span>
+<a href="#TOP">Top</a></p>
+<hr />
+<p><a name="drill_assembly"></a></p>
+<h2>6 x Drill Assembly</h2>
+<h3>Vitamins</h3>
+<table>
+<thead>
+<tr>
+<th align="right">Qty</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">6</td>
+<td align="left">Extrusion E4080 x 200mm</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Leadscrew 8 x 184mm, 8mm lead, 4 starts</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Linear rail HGH20 x 200mm</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Shaft coupling SC_635x8_rigid</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Stepper motor NEMA22 x 51.2mm</td>
+</tr>
+</tbody>
+</table>
+<h3>CNC Routed parts</h3>
+<table>
+<thead>
+<tr>
+<th>6 x z_axis_motor_mount.dxf</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="z_axis_motor_mount.dxf" src="dxfs/z_axis_motor_mount.png" /></td>
+</tr>
+</tbody>
+</table>
+<h3>Assembly instructions</h3>
+<p><img alt="drill_assembly" src="assemblies/drill_assembly.png" /></p>
+<p>This assembly is for a drill.</p>
+<p>Each drill has independent spindle and an independent Z-axis.</p>
+<p><img alt="drill_assembled" src="assemblies/drill_assembled.png" /></p>
+<p><span></span>
+<a href="#TOP">Top</a></p>
+<hr />
+<p><a name="gang_drill_assembly"></a></p>
+<h2>Gang Drill Assembly</h2>
+<h3>Vitamins</h3>
+<table>
+<thead>
+<tr>
+<th align="right">Qty</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">2</td>
+<td align="left">Extrusion E4080 x 2400mm</td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td align="left">Extrusion E4080 x 300mm</td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td align="left">Extrusion E4080 x 320mm</td>
+</tr>
+</tbody>
+</table>
+<h3>Sub-assemblies</h3>
+<table>
+<thead>
+<tr>
+<th>6 x drill_assembly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="drill_assembled" src="assemblies/drill_assembled_tn.png" /></td>
+</tr>
+</tbody>
+</table>
+<h3>Assembly instructions</h3>
+<p><img alt="gang_drill_assembly" src="assemblies/gang_drill_assembly.png" /></p>
+<p>This assembly is for a gang of drills on a frame.</p>
+<p>The number of drills should be a divisor of the total number of holes per beam (60). So we might start with 6 drills, so 10 holes to be drilled per drill.</p>
+<p><img alt="gang_drill_assembled" src="assemblies/gang_drill_assembled.png" /></p>
+<p><span></span>
+<a href="#TOP">Top</a></p>
+<hr />
+<p><a name="x_axis_assembly"></a></p>
+<h2>X Axis Assembly</h2>
+<h3>Vitamins</h3>
+<table>
+<thead>
+<tr>
+<th align="right">Qty</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">8</td>
+<td align="left">Ball bearing 688ZZZZ 8mm x 16mm x 5mm</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="left">Extrusion E4080 x 140mm</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="left">Extrusion E4080 x 2400mm</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="left">Leadscrew 8 x 700mm, 8mm lead, 4 starts</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td align="left">Linear rail HGH20 x 600mm</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="left">Shaft coupling SC_635x8_rigid</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td align="left">Stepper motor NEMA22 x 51.2mm</td>
+</tr>
+</tbody>
+</table>
+<h3>3D Printed parts</h3>
+<table>
+<thead>
+<tr>
+<th>4 x support_seat.stl</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="support_seat.stl" src="stls/support_seat.png" /></td>
+</tr>
+</tbody>
+</table>
+<h3>CNC Routed parts</h3>
+<table>
+<thead>
+<tr>
+<th>2 x x_axis_motor_mount.dxf</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="x_axis_motor_mount.dxf" src="dxfs/x_axis_motor_mount.png" /></td>
+</tr>
+</tbody>
+</table>
+<h3>Assembly instructions</h3>
+<p><img alt="x_axis_assembly" src="assemblies/x_axis_assembly.png" /></p>
+<p>This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.</p>
+<p>The necessary X-axis travel distance is equal to the total length divided by the number of spindles, so 2400mm / 6 spindles = 400mm / spindle, so the X-axis linear actuator needs to be able to move at least 400mm.</p>
+<p><img alt="x_axis_assembled" src="assemblies/x_axis_assembled.png" /></p>
+<p><span></span>
+<a href="#TOP">Top</a></p>
+<hr />
+<p><a name="main_assembly"></a></p>
+<h2>Main Assembly</h2>
+<h3>Sub-assemblies</h3>
+<table>
+<thead>
+<tr>
+<th>1 x gang_drill_assembly</th>
+<th>1 x x_axis_assembly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="gang_drill_assembled" src="assemblies/gang_drill_assembled_tn.png" /></td>
+<td><img alt="x_axis_assembled" src="assemblies/x_axis_assembled_tn.png" /></td>
+</tr>
+</tbody>
+</table>
+<h3>Assembly instructions</h3>
+<p><img alt="main_assembly" src="assemblies/main_assembly.png" /></p>
+<p>Main assembly</p>
+<p><img alt="main_assembled" src="assemblies/main_assembled.png" /></p>
+<p><span></span>
+<a href="#TOP">Top</a></p>
