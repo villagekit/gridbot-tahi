@@ -24,8 +24,8 @@ length_axis_sheet_type = AL6;
 length_axis_plate_size = [200, 200];
 length_axis_extrusion_type = E2080;
 length_axis_length = 1500;
-length_axis_rail_type = HGH20CA;
-length_axis_rail_carriage_type = HGH20CA_carriage;
+length_axis_rail_type = HGH15CA;
+length_axis_rail_carriage_type = HGH15CA_carriage;
 length_axis_rail_carriage_pos = 0;
 length_axis_rail_t_nut = M5_sliding_t_nut;
 length_axis_motor_NEMA_type = NEMA23_51;
@@ -49,7 +49,7 @@ width_axis_carriage_type = HGH15CA_carriage;
 width_axis_motor_NEMA_type = NEMA23_51;
 width_axis_motor_coupling_type = SC_635x8_rigid;
 width_axis_offset = [
-  length_axis_offset[0] + (1/2) * length_axis_length,
+  length_axis_offset[0],
   length_axis_offset[1] + 0,
   length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_sheet_type)
 ];
@@ -60,6 +60,7 @@ spindle_motor_NEMA_type = NEMA23_51;
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
 module length_axis_plate_dxf() {
   dxf("length_axis_plate");
+    // TODO update sheet_size
     sheet_size = [
       133, // HGH20CA carriages have 77.5mm overall length, 50.5mm block length, so 77.5mm + 50.5mm + 5mm = 133mm
       140 // HGH20CA carriages have 44mm width, so 80mm + (carriage excess) 2 * 12mm + (arbitrary) 36mm = 140mm
@@ -215,7 +216,7 @@ module gear_rack_motor_mount_plate_dxf() {
 
 module length_axis_rail() {
   translate([
-    (1/2) * length_axis_length,
+    0,
     0,
     extrusion_width(length_axis_extrusion_type)
   ])
@@ -247,7 +248,7 @@ module length_axis_assembly()
 assembly("length_axis") {
   // frame
   translate([
-    (1/2) * length_axis_length,
+    0,
     (1/2) * extrusion_height(length_axis_extrusion_type),
     (1/2) * extrusion_width(length_axis_extrusion_type)
   ])
@@ -264,7 +265,7 @@ assembly("length_axis") {
 
   // plate
   translate([
-    (1/2) * length_axis_length,
+    0,
     0,
     extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_sheet_type)
   ])
@@ -273,10 +274,11 @@ assembly("length_axis") {
 
   // motor mount
   translate([
-    (1/2) * length_axis_length,
-    -20,
-    extrusion_width(length_axis_extrusion_type)
+    0,
+    -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - 10,
+    (1/2) * extrusion_width(length_axis_extrusion_type) - 5
   ])
+  rotate([90, 10, 0])
   render_2D_sheet(gear_rack_motor_mount_plate_sheet_type)
     gear_rack_motor_mount_plate_dxf();
 }
@@ -329,7 +331,7 @@ assembly("main") {
     length_axis_assembly();
 
   translate(width_axis_offset)
-  width_axis_assembly();
+    width_axis_assembly();
 
   spindle_assembly();
 
