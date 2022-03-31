@@ -20,14 +20,28 @@ include <./lib.scad>
 
 // $show_threads = true;
 
-length_axis_sheet_type = AL6;
-length_axis_plate_size = [200, 200];
 length_axis_extrusion_type = E2080;
 length_axis_length = 1500;
 length_axis_rail_type = HGH15CA;
 length_axis_rail_carriage_type = HGH15CA_carriage;
+length_axis_rail_carriage_spacing = 5;
 length_axis_rail_carriage_pos = 0;
 length_axis_rail_t_nut = M5_sliding_t_nut;
+length_axis_plate_sheet_type = AL6;
+length_axis_plate_carriage_overhang = (1/2) * (carriage_width(length_axis_rail_carriage_type) - 20);
+length_axis_plate_join_screw = M5_cap_screw;
+length_axis_plate_join_margin = washer_diameter(screw_washer(length_axis_plate_join_screw));
+length_axis_plate_overhang_x_plus = 2 * length_axis_plate_join_margin;
+length_axis_plate_overhang_x_minus = 30;
+length_axis_plate_size = [
+    // length_axis_rail_carriage_spacing + 2 * carriage_length(length_axis_rail_carriage_type),
+    100 + 4 * length_axis_plate_join_margin,
+    80 + 2 * length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus + length_axis_plate_overhang_x_minus
+  ];
+length_axis_plate_offset = [
+    0,
+    (1/2) * length_axis_plate_size[1] - length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus
+  ];
 length_axis_motor_NEMA_type = NEMA23_51;
 length_axis_gear_module = 1;
 length_axis_gear_pressure_angle = 20;
@@ -37,7 +51,7 @@ length_axis_offset = [0, 0, 0];
 
 gear_rack_motor_mount_plate_sheet_type = AL10;
 
-width_axis_sheet_type = AL6;
+width_axis_plate_sheet_type = AL6;
 width_axis_extrusion_type = E20100;
 width_axis_travel_distance = 100;
 width_axis_leadscrew_diameter = 8;
@@ -51,50 +65,137 @@ width_axis_motor_coupling_type = SC_635x8_rigid;
 width_axis_offset = [
   length_axis_offset[0],
   length_axis_offset[1] + 0,
-  length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_sheet_type)
+  length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_plate_sheet_type)
 ];
 
-spindle_sheet_type = AL6;
+spindle_plate_sheet_type = AL6;
 spindle_motor_NEMA_type = NEMA23_51;
 
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
 module length_axis_plate_dxf() {
   dxf("length_axis_plate");
-    // TODO update sheet_size
-    sheet_size = [
-      133, // HGH20CA carriages have 77.5mm overall length, 50.5mm block length, so 77.5mm + 50.5mm + 5mm = 133mm
-      140 // HGH20CA carriages have 44mm width, so 80mm + (carriage excess) 2 * 12mm + (arbitrary) 36mm = 140mm
-    ];
-    sheet_offset = [
-      0,
-      (1/2) * sheet_size[1] - (12 + 36)
-    ];
 
-    difference() {
-      translate(sheet_offset)
-        sheet_2D(length_axis_sheet_type, sheet_size[0], sheet_size[1], 2);
+  difference() {
+    translate(length_axis_plate_offset)
+      sheet_2D(length_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
 
-      // rail #1, carriage #1
-      translate([2.5 + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
-      carriage_hole_positions(length_axis_rail_carriage_type)
-        circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+    // length-axis rail #1, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
 
-      // rail #1, carriage #2
-      translate([-2.5 - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
-      carriage_hole_positions(length_axis_rail_carriage_type)
-        circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+    // length-axis rail #1, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
 
-      // rail #2, carriage #1
-      translate([2.5 + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
-      carriage_hole_positions(length_axis_rail_carriage_type)
-        circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+    // length-axis rail #2, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
 
-      // rail #2, carriage #2
-      translate([-2.5 - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
-      carriage_hole_positions(length_axis_rail_carriage_type)
-        circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
-    }
+    // length-axis rail #2, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+
+    // width-axis extrusion join #1
+    translate([40, 40])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #2
+    translate([-40, 40])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #3
+    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #4
+    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+
+    // inter-plate join #1
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #2
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #3
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #4
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+  }
 }
+
+//! A plate mount for the width-axis, which connects to the length-axis.
+module width_axis_plate_dxf() {
+  dxf("width_axis_plate");
+
+  difference() {
+    translate(length_axis_plate_offset)
+      sheet_2D(width_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
+
+    // length-axis rail #1, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #1, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // width-axis extrusion join #1
+    translate([40, 40])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #2
+    translate([-40, 40])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #3
+    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #4
+    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #1
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #2
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #3
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #4
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+  }
+}
+
 
 //! Via MakerStore: https://www.makerstore.com.au/product/plate-motor-rack/
 module gear_rack_motor_mount_plate_dxf() {
@@ -225,11 +326,11 @@ module length_axis_rail() {
       rail(length_axis_rail_type, length_axis_length);
 
       // carriage #1
-      translate([2.5 + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
+      translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
         carriage(length_axis_rail_carriage_type);
 
       // carriage #2
-      translate([-2.5 + -(1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
+      translate([-(1/2) * length_axis_rail_carriage_spacing + -(1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
         carriage(length_axis_rail_carriage_type);
 
       // rail screws
@@ -267,9 +368,9 @@ assembly("length_axis") {
   translate([
     0,
     0,
-    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_sheet_type)
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_plate_sheet_type)
   ])
-  render_2D_sheet(length_axis_sheet_type)
+  render_2D_sheet(length_axis_plate_sheet_type)
     length_axis_plate_dxf();
 
   // motor mount
@@ -283,22 +384,21 @@ assembly("length_axis") {
     gear_rack_motor_mount_plate_dxf();
 }
 
-//! A plate mount for the width-axis, which connects to the length-axis.
-module width_axis_plate_dxf() {
-  dxf("width_axis_plate");
-
-}
-
 //! This assembly is for the axis that will travel perpendicular to the length of the grid beam (i.e. along the width of the grid beam).
 module width_axis_assembly()
 assembly("width_axis") {
   extrusion_length = width_axis_travel_distance + 170;
 
+  // plate
+  translate([0, 0, (1/2) * sheet_thickness(length_axis_plate_sheet_type)])
+    render_2D_sheet(width_axis_plate_sheet_type)
+    width_axis_plate_dxf();
+
   // frame
   translate([
     0,
     (1/2) * extrusion_height(width_axis_extrusion_type),
-    (1/2) * extrusion_width(width_axis_extrusion_type)
+    sheet_thickness(width_axis_plate_sheet_type) + (1/2) * extrusion_width(width_axis_extrusion_type)
   ])
     rotate([90, 90, 0])
     extrusion(width_axis_extrusion_type, extrusion_length);
