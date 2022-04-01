@@ -21,10 +21,6 @@ AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1   
 //                                                  side, length, radius, radius, radius, depth, shaft, length,      holes, heights,    dia,   caps,  conn,  length2, bore
 NEMA23_HG86001Y21B     = ["NEMA23_HG86001Y21B",     56.4, 86,     75.7/2, 35,   38.1/2, 1.6,   6.35,    21,        47.1,    [8,     8], 3,     false, false, 0,       0];
 
-// ball bearings
-//          name     id od   w    colour       or    ir    fd   fw
-SKF708  = ["SKF708", 8, 22,  7.5, "silver",    0.5,  0.7,   0,    0];
-
 // https://www.hiwin.de/en/Products/Bearing/Bearings-EK-EF/EK/EK08-C5/p/18-000428
 // https://salecnc.net/pictures/cnc_accessories/hose/imageSaleCNC/CNC%20PARTS/Ballscrew%20&%20Support/Web%20image/Support%20EK,%20EF/1.EK08%20&%20EF08%20Set%20Ball%20Screw%20Support/2.EK08%20&%20EF08%20Set%20Ball%20Screw%20Support.jpg
 module ek08() {
@@ -47,6 +43,7 @@ module ek08() {
   Z = 12;
 
   // translate so aligned with screw #1
+  color("#313131")
   translate([-(1/2) * (B - P), 0, 0])
   union() {
     difference() {
@@ -83,11 +80,6 @@ module ek08() {
       rotate([0, 0, 0])
         cylinder(d = Y, h = H1 + 2 * eps);
     }
-
-    // ball bearing
-    translate([(1/2) * B, (1/2) * L, h])
-      rotate([-90, 0, 0])
-      ball_bearing(SKF708);
   }
 }
 
@@ -109,46 +101,81 @@ module ef08() {
   Z = 12;
 
   // translate so aligned with screw #1
+  color("#313131")
   translate([-(1/2) * (B - P), 0, 0])
-  union() {
-    difference() {
-      // block
-      union() {
-        cube([B, L, H1]);
+  difference() {
+    // block
+    union() {
+      cube([B, L, H1]);
 
-        translate([(1/2) * (B - B1), 0, 0])
-          cube([B1, L, H]);
-      }
-
-      // ball bearing hole
-      translate([(1/2) * B, -eps, h])
-      rotate([-90, 0, 0])
-        cylinder(r = 12, h = L + 2 * eps);
-
-      // screw #1 bore
-      translate([(1/2) * (B - P), (1/2) * L, -eps])
-      rotate([0, 0, 0])
-        cylinder(d = X, h = H1 + 2 * eps);
-
-      // screw #1 cap
-      translate([(1/2) * (B - P), (1/2) * L, H - Z])
-      rotate([0, 0, 0])
-        cylinder(d = Y, h = H1 + 2 * eps);
-
-      // screw #2 bore
-      translate([B - (1/2) * (B - P), (1/2) * L, -eps])
-      rotate([0, 0, 0])
-        cylinder(d = X, h = H1 + 2 * eps);
-
-      // screw #2 cap
-      translate([B - (1/2) * (B - P), (1/2) * L, H - Z])
-      rotate([0, 0, 0])
-        cylinder(d = Y, h = H1 + 2 * eps);
+      translate([(1/2) * (B - B1), 0, 0])
+        cube([B1, L, H]);
     }
 
-    // ball bearing
-    translate([(1/2) * B, (1/2) * L, h])
-      rotate([-90, 0, 0])
-      ball_bearing(SKF708);
+    // ball bearing hole
+    translate([(1/2) * B, -eps, h])
+    rotate([-90, 0, 0])
+      cylinder(r = 12, h = L + 2 * eps);
+
+    // screw #1 bore
+    translate([(1/2) * (B - P), (1/2) * L, -eps])
+    rotate([0, 0, 0])
+      cylinder(d = X, h = H1 + 2 * eps);
+
+    // screw #1 cap
+    translate([(1/2) * (B - P), (1/2) * L, H - Z])
+    rotate([0, 0, 0])
+      cylinder(d = Y, h = H1 + 2 * eps);
+
+    // screw #2 bore
+    translate([B - (1/2) * (B - P), (1/2) * L, -eps])
+    rotate([0, 0, 0])
+      cylinder(d = X, h = H1 + 2 * eps);
+
+    // screw #2 cap
+    translate([B - (1/2) * (B - P), (1/2) * L, H - Z])
+    rotate([0, 0, 0])
+      cylinder(d = Y, h = H1 + 2 * eps);
+  }
+}
+
+spindle_er20_height = 62;
+spindle_er20_width = 60;
+spindle_er20_body_length = 155;
+spindle_er20_total_length = 241.5;
+spindle_er20_collet_length = 42.5;
+spindle_er20_collet_diameter = 30;
+spindle_er20_shaft_length = spindle_er20_total_length - spindle_er20_body_length - spindle_er20_collet_length;
+spindle_er20_shaft_diameter = 14;
+
+// https://www.aliexpress.com/item/1005001278002287.html
+module spindle_er20() {
+  vitamin(str("Spindle(", "ER20", ") : Spindle ER20"));
+
+  difference() {
+    union() {
+      // body
+      color("#066E06")
+      translate([0, -(1/2) * spindle_er20_width, 0])
+        rounded_cube_yz([spindle_er20_body_length, spindle_er20_width, spindle_er20_height], r = 10);
+
+      // shaft
+      color("#919191")
+      translate([-spindle_er20_shaft_length, 0, (1/2) * spindle_er20_height])
+        rotate([0, 90, 0])
+        cylinder(d = spindle_er20_shaft_diameter, h = spindle_er20_shaft_length);
+
+      // collet 1/2
+      color("#A8A8A8")
+        translate([spindle_er20_body_length, 0, (1/2) * spindle_er20_height])
+        rotate([0, 90, 0])
+        cylinder(d = spindle_er20_collet_diameter, h = (1/2) * spindle_er20_collet_length);
+
+      // collet 2/2
+      color("#3D3D3D")
+        translate([spindle_er20_body_length + (1/2) * spindle_er20_collet_length, 0, (1/2) * spindle_er20_height])
+        rotate([0, 90, 0])
+        cylinder(d = spindle_er20_collet_diameter, h = (1/2) * spindle_er20_collet_length);
+    }
   }
 }

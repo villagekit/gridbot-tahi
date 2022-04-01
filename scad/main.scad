@@ -60,14 +60,17 @@ width_axis_offset = [
   length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_plate_sheet_type)
 ];
 
+hanpose_hpv6_travel_distance = 100;
+hanpose_hpv6_extrusion_length = hanpose_hpv6_travel_distance + 170;
+hanpose_hpv6_ballscrew_length = hanpose_hpv6_travel_distance + 150;
+hanpose_hpv6_rail_length = hanpose_hpv6_travel_distance + 140;
 hanpose_hpv6_extrusion_type = E20100;
 hanpose_hpv6_travel_plate_sheet_type = AL10;
 hanpose_hpv6_travel_plate_size = [120, 100];
-hanpose_hpv6_travel_distance = 100;
-hanpose_hpv6_leadscrew_diameter = 8;
-hanpose_hpv6_leadscrew_lead = 8;
-hanpose_hpv6_leadscrew_starts = 4;
-hanpose_hpv6_leadscrew_nut = SFU1610;
+hanpose_hpv6_ballscrew_diameter = 8;
+hanpose_hpv6_ballscrew_lead = 8;
+hanpose_hpv6_ballscrew_starts = 4;
+hanpose_hpv6_ballscrew_nut = SFU1610;
 hanpose_hpv6_rail_type = HGH15CA;
 hanpose_hpv6_carriage_type = HGH15CA_carriage;
 hanpose_hpv6_motor_NEMA_type = NEMA23_51;
@@ -76,7 +79,14 @@ hanpose_hpv6_motor_coupling_type = SC_635x8_rigid;
 hanpose_hpv6_height = 63;
 
 spindle_plate_sheet_type = AL6;
+spindle_plate_spacer_sheet_type = AL6;
+spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
 spindle_motor_NEMA_type = NEMA23_51;
+spindle_offset = [
+  width_axis_offset[0],
+  width_axis_offset[1] + (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+  width_axis_offset[2] + sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height
+];
 
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
 module length_axis_plate_dxf() {
@@ -405,17 +415,12 @@ assembly("width_axis") {
     render_2D_sheet(width_axis_plate_sheet_type)
     width_axis_plate_dxf();
 
-  hanpose_hpv6_linear_guide();
+  hanpose_hpv6_linear_guide_assembly();
 }
 
 //! Hanpose HPV6: https://www.aliexpress.com/item/32908794883.html
-module hanpose_hpv6_linear_guide() {
-  vitamin(str("Linear Guide(", "Hanpose HPV6", ") : Linear Guide Hanpose HPV6 " ));
-
-  extrusion_length = hanpose_hpv6_travel_distance + 170;
-  ballscrew_length = hanpose_hpv6_travel_distance + 150;
-  rail_length = hanpose_hpv6_travel_distance + 140;
-
+module hanpose_hpv6_linear_guide_assembly()
+assembly("hanpose_hpv6_linear_guide") {
   // frame
   translate([
     0,
@@ -423,7 +428,7 @@ module hanpose_hpv6_linear_guide() {
     sheet_thickness(width_axis_plate_sheet_type) + (1/2) * extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     rotate([0, 90, 90])
-    extrusion(hanpose_hpv6_extrusion_type, extrusion_length);
+    extrusion(hanpose_hpv6_extrusion_type, hanpose_hpv6_extrusion_length);
 
   // fixed side bearing
   translate([
@@ -436,7 +441,7 @@ module hanpose_hpv6_linear_guide() {
   // floating side bearing
   translate([
     -20,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - 14 /* eko8 L */,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - 14 /* eko8 L */,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     ef08();
@@ -444,18 +449,18 @@ module hanpose_hpv6_linear_guide() {
   // ballscrew
   translate([
     0,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * ballscrew_length - 7 /* eko8 L/2 */,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_ballscrew_length - 7 /* eko8 L/2 */,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* ek08 h */
   ])
     rotate([90, 0, 0])
-    leadscrew(8, ballscrew_length, 10, 1 );
+    leadscrew(8, hanpose_hpv6_ballscrew_length, 10, 1 );
 
   // TODO motor plate
 
   // motor
   translate([
     0,
-    -(1/2) * (extrusion_length) + width_axis_plate_offset_y - sheet_thickness(hanpose_hpv6_motor_plate_sheet_type),
+    -(1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - sheet_thickness(hanpose_hpv6_motor_plate_sheet_type),
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* eko8 h */
   ])
     rotate([-90, 0, 0])
@@ -464,7 +469,7 @@ module hanpose_hpv6_linear_guide() {
   // motor shaft coupler
   translate([
     0,
-    -(1/2) * (extrusion_length) + width_axis_plate_offset_y + 15 /* arbitrary */,
+    -(1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y + 15 /* arbitrary */,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* eko8 h */
   ])
     rotate([-90, 0, 0])
@@ -473,25 +478,25 @@ module hanpose_hpv6_linear_guide() {
   // rail #1
   translate([
     -40,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * rail_length,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     rotate([0, 0, 90])
-    rail(hanpose_hpv6_rail_type, rail_length);
+    rail(hanpose_hpv6_rail_type, hanpose_hpv6_rail_length);
 
   // rail #2
   translate([
     40,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * rail_length,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     rotate([0, 0, 90])
-    rail(hanpose_hpv6_rail_type, rail_length);
+    rail(hanpose_hpv6_rail_type, hanpose_hpv6_rail_length);
 
   // carriage #1
   translate([
     -40,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * rail_length,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     rotate([0, 0, 90])
@@ -500,7 +505,7 @@ module hanpose_hpv6_linear_guide() {
   // carriage #2
   translate([
     40,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * rail_length,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
     sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
   ])
     rotate([0, 0, 90])
@@ -511,7 +516,7 @@ module hanpose_hpv6_linear_guide() {
   // travel plate
   translate([
     0,
-    (1/2) * (extrusion_length) + width_axis_plate_offset_y - (1/2) * rail_length,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
     sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height - (1/2) * sheet_thickness(hanpose_hpv6_travel_plate_sheet_type)
   ])
     render_2D_sheet(hanpose_hpv6_travel_plate_sheet_type)
@@ -520,7 +525,7 @@ module hanpose_hpv6_linear_guide() {
 
 module hanpose_hpv6_travel_plate() {
   difference() {
-    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1]);
+    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
 
     // screw #1
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
@@ -560,6 +565,67 @@ module hanpose_hpv6_travel_plate() {
 module spindle_plate_dxf() {
   dxf("spindle_plate");
 
+  difference() {
+    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
+
+    // screw #1
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #2
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #3
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #4
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #5
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #6
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #7
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #8
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+  }
+}
+
+//! A plate to space the spindle plate above the width-axis
+module spindle_plate_spacer_dxf() {
+  dxf("spindle_plate_spacer");
+
+  difference() {
+    sheet_2D(spindle_plate_spacer_sheet_type, spindle_plate_spacer_size[0], spindle_plate_spacer_size[1], 3);
+
+    // screw #1
+    translate([(1/2) * spindle_plate_spacer_size.x - 10, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #2
+    translate([(1/2) * spindle_plate_spacer_size.x - 30, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #3
+    translate([-(1/2) * spindle_plate_spacer_size.x + 30, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #4
+    translate([-(1/2) * spindle_plate_spacer_size.x + 10, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+  }
+
 }
 
 //! This assembly is for a spindle and motor connected via gears.
@@ -568,6 +634,27 @@ module spindle_plate_dxf() {
 //! - Motor: [iHSV57-180 Nema23 180W Integrated Servo Motor](https://www.makerstore.com.au/product/elec-ihsv57-180/)
 module spindle_assembly()
 assembly("spindle") {
+  union() {
+    // spacer #1
+    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+      render_2D_sheet(spindle_plate_spacer_sheet_type)
+      spindle_plate_spacer_dxf();
+
+    // spacer #2
+    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+      render_2D_sheet(spindle_plate_spacer_sheet_type)
+      spindle_plate_spacer_dxf();
+
+    // spindle plate
+    translate([0, 0, sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * sheet_thickness(spindle_plate_sheet_type)])
+      render_2D_sheet(spindle_plate_sheet_type)
+      spindle_plate_dxf();
+
+    // spindle
+    translate([0, -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
+      rotate([0, 0, 90])
+      spindle_er20();
+  }
 }
 
 //! This assembly is to hold the workpiece: the grid beam.
@@ -585,7 +672,8 @@ assembly("main") {
   translate(width_axis_offset)
     width_axis_assembly();
 
-  spindle_assembly();
+  translate(spindle_offset)
+    spindle_assembly();
 
   workholding_assembly();
 }
