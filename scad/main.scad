@@ -1,397 +1,742 @@
 //
-// NopSCADlib Copyright Chris Palmer 2018
-// GridBot Copyright Michael Williams 2021
+// NopSCADlib: Copyright Chris Palmer 2018
+// GridBot: Copyright Village Kit Limited 2022
 //
 // This file is licensed under the GPL-3.0 license, as with NopSCADlib.
-//
-// NopSCADlib is free software: you can redistribute it and/or modify it under the terms of the
-// GNU General Public License as published by the Free Software Foundation, either version 3 of
-// the License, or (at your option) any later version.
-//
-// NopSCADlib is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// See the GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License along with NopSCADlib.
-// If not, see <https://www.gnu.org/licenses/>.
-//
 
-//! A multi-spindle single-axis CNC.
+//! A simple open source machine for automated [grid beam](https://gridbeam.xyz) production.
 //!
-//! For the framing, we'll use 8040 aluminium extrusion since it's fit for purpose and readily available here in New Zealand.
+//! Where possible, uses easy-to-source OpenBuilds components (e.g. [MakerStore](https://www.makerstore.com.au/), [BulkMan 3D](https://bulkman3d.com/)) or other readily available standardized parts, following inspiration from open source "pro" consumer CNC machines.
 //!
-//! Where possible, we'll try to use motion control components found in "pro" consumer CNC machines (AvidCNC, RoverCNC, QueenBee, etc), e.g. stepper motors, lead screws, linear rails, etc.
+//! One spindle, two axis of motion (beam-length and beam-width).
+//!
+//! ***
+//! 
+//! ***
+//!
+//! Hardware design assets and documentation licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), `.scad` files licensed under GPL-3.0 (as with NopSCADlib).
+//!
+//! Previous design notes: https://wiki.villagekit.com/en/grid-bot
+//!
+//! Inspiration:
+//!
+//! - Phil and Richard's multi-spindle drill press: https://youtu.be/PIMESt9iLYg
+//! - BeamCNC: https://github.com/VladLunachev/BeamCNC/
+//! - https://wiki.replimat.org/wiki/Automated_drilling_machines
+//! - https://youtu.be/YmD3KoqatHs
+//! - https://youtu.be/1WsEdbiqdlA
+//! - https://youtu.be/ksaT63qqIJM
+//! - https://youtu.be/h0pohupmKKk
+//! - https://youtu.be/mg9bALNiYPU
+//! - https://youtu.be/ocbE4NLd9go
 
-EPS = 0.001;
+include <NopSCADlib/lib.scad> 
 
-include <NopSCADlib/core.scad>
-include <NopSCADlib/vitamins/ball_bearings.scad>
-include <NopSCADlib/vitamins/extrusions.scad>
-include <NopSCADlib/vitamins/leadnuts.scad>
-include <NopSCADlib/vitamins/rails.scad>
-include <NopSCADlib/vitamins/shaft_couplings.scad>
-include <NopSCADlib/vitamins/sheets.scad>
-include <NopSCADlib/vitamins/stepper_motors.scad>
-
-// ball bearings
-BB688ZZ =  ["688ZZ", 8,  16,  5,   "silver",    1.5, 1.5];
-
-// rails
-//                Wr  Hr    E     P   D    d    h                                       go?   gw?
-HGH20= [ "HGH20", 20, 17.5, 20,   60, 9.5, 6, 8.5, M5_cap_screw,    M5_cs_cap_screw,  5,  5.5 ];
-//                     L     L1    W   H   H1   C   B
-HGH20CA_carriage  = [ 77.5, 50.5, 44, 30, 4.6, 36,  32, M5_cap_screw, HGH20 ];
-HGH20HA_carriage  = [ 92.2, 65.2, 44, 30, 4.6, 50,  32, M5_cap_screw, HGH20 ];
-
-// shaft_couplings
-//                                       L   D       d1   d2
-SC_635x8_rigid  = [ "SC_635x8_rigid",    25, 12.5, 6.35,   8 ];
-
-use <NopSCADlib/vitamins/extrusion.scad>
-use <NopSCADlib/vitamins/leadnut.scad>
-use <NopSCADlib/vitamins/rail.scad>
-use <NopSCADlib/vitamins/rod.scad>
-use <NopSCADlib/vitamins/shaft_coupling.scad>
-use <NopSCADlib/vitamins/sheet.scad>
-use <NopSCADlib/vitamins/stepper_motor.scad>
+include <./lib.scad>
 
 // $show_threads = true;
 
-beam_width = 40;
-NEMA_type = NEMA23;
-leadnut_type = LSN8x8;
-leadscrew_diameter = 8;
-leadscrew_lead = 8;
-leadscrew_starts = 4;
-leadscrew_bearing = BB688ZZ;
-rail_type = HGH20;
-shaft_coupling_type = SC_635x8_rigid;
-sheet_type = AL8;
+length_axis_extrusion_type = E2080;
+length_axis_length = 1500;
+length_axis_rail_type = HGH20CA;
+length_axis_rail_carriage_type = HGH20CA_carriage;
+length_axis_rail_carriage_spacing = 5;
+length_axis_rail_carriage_pos = 0;
+length_axis_rail_t_nut = M5_sliding_t_nut;
+length_axis_plate_sheet_type = AL6;
+length_axis_plate_carriage_overhang = (1/2) * (carriage_width(length_axis_rail_carriage_type) - 20);
+length_axis_plate_join_screw = M5_cap_screw;
+length_axis_plate_join_margin = screw_head_radius(length_axis_plate_join_screw) * 1.2;
+length_axis_plate_overhang_x_plus = 2 * length_axis_plate_join_margin;
+length_axis_plate_overhang_x_minus = 30;
+length_axis_plate_size = [
+    max(
+      length_axis_rail_carriage_spacing + 2 * carriage_length(length_axis_rail_carriage_type),
+      100 + 4 * length_axis_plate_join_margin
+    ),
+    80 + 2 * length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus + length_axis_plate_overhang_x_minus
+  ];
+length_axis_plate_offset = [
+    0,
+    (1/2) * length_axis_plate_size[1] - length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus
+  ];
+length_axis_motor_NEMA_type = NEMA23_HG86001Y21B;
+length_axis_motor_mount_offset_y = -length_axis_plate_carriage_overhang - 2;
+length_axis_gear_module = 1;
+length_axis_gear_pressure_angle = 20;
+length_axis_gear_pinion_teeth = 14;
+length_axis_gear_rack_length = 500;
+length_axis_offset = [0, 0, 0];
 
-x_axis_x_length = 2400;
-x_axis_y_length = 300;
-x_axis_travel_distance = 600;
-x_axis_leadscrew_length = 700;
+gear_rack_motor_mount_plate_sheet_type = AL10;
 
-drill_z_length = 200;
+width_axis_plate_sheet_type = AL6;
+width_axis_plate_offset_y = 20;
+width_axis_offset = [
+  length_axis_offset[0],
+  length_axis_offset[1] + 0,
+  length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_plate_sheet_type)
+];
 
-gang_z_length = 400;
-gang_y_length = x_axis_y_length + 2 * beam_width;
-gang_x_length = x_axis_x_length;
-gang_drill_count = 6;
+hanpose_hpv6_travel_distance = 100;
+hanpose_hpv6_extrusion_length = hanpose_hpv6_travel_distance + 170;
+hanpose_hpv6_ballscrew_length = hanpose_hpv6_travel_distance + 150;
+hanpose_hpv6_rail_length = hanpose_hpv6_travel_distance + 140;
+hanpose_hpv6_extrusion_type = E20100;
+hanpose_hpv6_travel_plate_sheet_type = AL10;
+hanpose_hpv6_travel_plate_size = [120, 100];
+hanpose_hpv6_ballscrew_diameter = 8;
+hanpose_hpv6_ballscrew_lead = 8;
+hanpose_hpv6_ballscrew_starts = 4;
+hanpose_hpv6_ballscrew_nut = SFU1610;
+hanpose_hpv6_rail_type = HGH15CA;
+hanpose_hpv6_carriage_type = HGH15CA_carriage;
+hanpose_hpv6_motor_NEMA_type = NEMA23_51;
+hanpose_hpv6_motor_plate_sheet_type = AL10;
+hanpose_hpv6_motor_coupling_type = SC_635x8_rigid;
+hanpose_hpv6_height = 63;
 
-//! A NEMA_type motor mount plate for the y-axis.
-module x_axis_motor_mount_dxf() {
-  dxf("x_axis_motor_mount");
+spindle_plate_sheet_type = AL6;
+spindle_plate_spacer_sheet_type = AL6;
+spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
+spindle_motor_NEMA_type = NEMA23_51;
+spindle_offset = [
+  width_axis_offset[0],
+  width_axis_offset[1] + (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+  width_axis_offset[2] + sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height
+];
+spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_sheet_type) + sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * spindle_er20_height;
 
-  union() {
-  
-    translate([2 * NEMA_body_radius(NEMA_type), (3 / 2) * beam_width])
-    difference() {
-      scale(1.2)
-      NEMA_outline(NEMA_type);
+workholding_bed_height = spindle_drill_point_height - 20;
+workholding_leg_count = 5;
+workholding_leg_extrusion_type = E2040;
+workholding_arm_extrusion_type = E2040;
+workholding_size = [
+  length_axis_length,
+  200,
+  workholding_bed_height + 40,
+];
+workholding_bed_extrusion_type = E2020;
 
-      circle(NEMA_big_hole(NEMA_type));
-
-      NEMA_screw_positions(NEMA_type) {
-        circle(M5_clearance_radius);
-      }
-    }
-
-    difference() {
-      square([beam_width, 3 * beam_width]);
-
-      translate([(1 / 2) * beam_width, 0.5 * beam_width])
-      circle(M8_clearance_radius);
-
-      translate([(1 / 2) * beam_width, 2.5 * beam_width])
-      circle(M8_clearance_radius);
-    }
-  }
-}
-
-//! A NEMA_type motor mount plate for the z-axis.
-module z_axis_motor_mount_dxf() {
-  dxf("z_axis_motor_mount");
-
-  union() {
-  
-    translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width])
-    difference() {
-      scale(1.2)
-      NEMA_outline(NEMA_type);
-
-      circle(NEMA_big_hole(NEMA_type));
-
-      NEMA_screw_positions(NEMA_type) {
-        circle(M5_clearance_radius);
-      }
-    }
-
-    difference() {
-      translate([0, -beam_width])
-      square([beam_width, 2 * beam_width]);
-
-      translate([(1 / 2) * beam_width, 0.5 * beam_width])
-      circle(M8_clearance_radius);
-
-      translate([(1 / 2) * beam_width, -0.5 * beam_width])
-      circle(M8_clearance_radius);
-    }
-  }
-}
-
-//! A support seat block designed to support a leadscrew (with a bearing) and a rail.
-//!
-//! TODO fix the design
-module support_seat_stl() {
-  stl("support_seat");
+//! A plate to connect the length-axis components, which connects to the width-axis mount plate.
+module length_axis_plate_dxf() {
+  dxf("length_axis_plate");
 
   difference() {
+    translate(length_axis_plate_offset)
+      sheet_2D(length_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
+
+    // length-axis rail #1, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #1, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
+
+    // width-axis extrusion join #1
+    translate([40, 40])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #2
+    translate([-40, 40])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #3
+    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #4
+    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+
+
+    // inter-plate join #1
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #2
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #3
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #4
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+  }
+}
+
+//! A plate mount for the width-axis, which connects to the length-axis.
+module width_axis_plate_dxf() {
+  dxf("width_axis_plate");
+
+  difference() {
+    translate(length_axis_plate_offset)
+      sheet_2D(width_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
+
+    // length-axis rail #1, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #1, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #1
+    translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // length-axis rail #2, carriage #2
+    translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
+    carriage_hole_positions(length_axis_rail_carriage_type)
+      circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // width-axis extrusion join #1
+    translate([40, 40])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #2
+    translate([-40, 40])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #3
+    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // width-axis extrusion join #4
+    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #1
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #2
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #3
+    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+
+    // inter-plate join #4
+    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+  }
+}
+
+
+//! Via MakerStore: https://www.makerstore.com.au/product/plate-motor-rack/
+module gear_rack_motor_mount_plate_dxf() {
+  dxf("gear_rack_motor_mount_plate");
+
+  NEMA_type = length_axis_motor_NEMA_type;
+
+  translate([-65, 0])
+  difference() {
+    hull() {
+      // bottom
+      circle(r = 5);
+
+      // bottom right
+      translate([30, 30])
+        circle(r = 5);
+
+      // bottom left
+      translate([30, -30])
+        circle(r = 5);
+
+      // top
+      translate([130, 0])
+        circle(r = 5);
+
+      // top right
+      translate([100, 30])
+        circle(r = 5);
+
+      // top left
+      translate([100, -30])
+        circle(r = 5);
+    }
+
+    // motor
+    translate([65, 0])
+      union() {
+        // big hole
+        circle(r = NEMA_big_hole(NEMA_type));
+
+        // screw holes
+        NEMA_screw_positions(NEMA_type)
+          circle(d = NEMA_thread_d(NEMA_type));
+      }
+
+    // bottom row #1, item #1
+    translate([10, 0])
+      circle(d = 5.1);
+
+    // bottom row #2, item #1
+    translate([20, -10])
+      circle(d = 5.1);
+
+    // bottom row #2, item #2
+    translate([20, 0])
+      circle(d = 5.1);
+
+    // bottom row #2, item #3
+    translate([20, 10])
+      circle(d = 5.1);
+
+    // bottom row #3, item #1
+    translate([30, -20])
+      circle(d = 5.1);
+
+    // bottom row #3, item #2
+    translate([30, -10])
+      circle(d = 5.1);
+
+    // bottom row #3, item #3
+    translate([30, 0])
+      circle(d = 5.1);
+
+    // bottom row #3, item #4
+    translate([30, 10])
+      circle(d = 5.1);
+
+    // bottom row #3, item #5
+    translate([30, 20])
+      circle(d = 5.1);
+
+    // top row #1, item #1
+    translate([120, 0])
+      circle(d = 5.1);
+
+    // top row #2, item #1
+    translate([110, -10])
+      circle(d = 5.1);
+
+    // top row #2, item #2
+    translate([110, 0])
+      circle(d = 5.1);
+
+    // top row #2, item #3
+    translate([110, 10])
+      circle(d = 5.1);
+
+    // top row #3, item #1
+    translate([100, -20])
+      circle(d = 5.1);
+
+    // top row #3, item #2
+    translate([100, -10])
+      circle(d = 5.1);
+
+    // bottom row #3, item #3
+    translate([100, 0])
+      circle(d = 5.1);
+
+    // bottom row #3, item #4
+    translate([100, 10])
+      circle(d = 5.1);
+
+    // bottom row #3, item #5
+    translate([100, 20])
+      circle(d = 5.1);
+  }
+}
+
+module length_axis_rail() {
+  translate([
+    0,
+    0,
+    extrusion_width(length_axis_extrusion_type)
+  ])
     union() {
-      translate([0, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
-      rotate([0, 90, 0])
-      cylinder(
-        h = (1 / 2) * beam_width,
-        d = beam_width
-      );
+      // rail
+      rail(length_axis_rail_type, length_axis_length);
 
-      cube([(1 / 2) * beam_width, 2 * beam_width, (1 / 2) * beam_width]);
+      // carriage #1
+      translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
+        carriage(length_axis_rail_carriage_type);
 
-      translate([0, beam_width, 0])
-      cube([beam_width, beam_width, (1 / 2) * beam_width]);
+      // carriage #2
+      translate([-(1/2) * length_axis_rail_carriage_spacing + -(1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 0, 0])
+        carriage(length_axis_rail_carriage_type);
+
+      // rail screws
+      rail_screws(length_axis_rail_type, length_axis_length, 4);
+
+      // rails t-nuts
+      translate([0, 0, -nut_square_thickness(length_axis_rail_t_nut)])
+        rail_hole_positions(length_axis_rail_type, length_axis_length)
+        sliding_t_nut(length_axis_rail_t_nut);
     }
-
-    translate([-EPS, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
-    rotate([0, 90, 0])
-    cylinder(
-      h = beam_width + 2 * EPS,
-      d = bb_diameter(leadscrew_bearing)
-    );
-    
-    translate([-EPS, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type) - beam_width])
-    rotate([0, 90, 0])
-    cylinder(
-      h = beam_width + 2 * EPS,
-      d = bb_diameter(leadscrew_bearing)
-    );
-  }
 }
 
 
-//! A housing block designed to connect a lead screw to lead nuts, and a carriage.
-//!
-//! Similar to https://www.makerstore.com.au/product/hard-nut-house/
-module leadnut_block_stl() {
-  stl("leadnut_block");
+//! This assembly is for the axis that will travel along the length of the grid beam.
+module length_axis_assembly()
+assembly("length_axis") {
+  // frame
+  translate([
+    0,
+    (1/2) * extrusion_height(length_axis_extrusion_type),
+    (1/2) * extrusion_width(length_axis_extrusion_type)
+  ])
+    rotate([0, -90, 0])
+    extrusion(length_axis_extrusion_type, length_axis_length);
+
+  // rail #1
+  translate([0, 10, 0])
+    length_axis_rail();
+
+  // rail #2
+  translate([0, 70, 0])
+    length_axis_rail();
+
+  // plate
+  translate([
+    0,
+    0,
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_plate_sheet_type)
+  ])
+  render_2D_sheet(length_axis_plate_sheet_type)
+    length_axis_plate_dxf();
+
+  // motor
+  translate([
+    0,
+    -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + length_axis_motor_mount_offset_y,
+    (1/2) * extrusion_width(length_axis_extrusion_type) - 5
+  ])
+  rotate([90, 10, 0])
+  union() {
+    render_2D_sheet(gear_rack_motor_mount_plate_sheet_type)
+      gear_rack_motor_mount_plate_dxf();
+
+    rotate([180, 0, 0])
+    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+      NEMA(length_axis_motor_NEMA_type);
+  }
+}
+
+//! This assembly is for the axis that will travel perpendicular to the length of the grid beam (i.e. along the width of the grid beam).
+module width_axis_assembly()
+assembly("width_axis") {
+  // plate
+  translate([0, 0, (1/2) * sheet_thickness(length_axis_plate_sheet_type)])
+    render_2D_sheet(width_axis_plate_sheet_type)
+    width_axis_plate_dxf();
+
+  hanpose_hpv6_linear_guide_assembly();
+}
+
+//! Hanpose HPV6: https://www.aliexpress.com/item/32908794883.html
+module hanpose_hpv6_linear_guide_assembly()
+assembly("hanpose_hpv6_linear_guide") {
+  // frame
+  translate([
+    0,
+    width_axis_plate_offset_y,
+    sheet_thickness(width_axis_plate_sheet_type) + (1/2) * extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    rotate([0, 90, 90])
+    extrusion(hanpose_hpv6_extrusion_type, hanpose_hpv6_extrusion_length);
+
+  // fixed side bearing
+  translate([
+    -20,
+    width_axis_plate_offset_y - hanpose_hpv6_travel_distance,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    ek08();
+
+  // floating side bearing
+  translate([
+    -20,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - 14 /* eko8 L */,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    ef08();
+
+  // ballscrew
+  translate([
+    0,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_ballscrew_length - 7 /* eko8 L/2 */,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* ek08 h */
+  ])
+    rotate([90, 0, 0])
+    leadscrew(8, hanpose_hpv6_ballscrew_length, 10, 1 );
+
+  // TODO motor plate
+
+  // motor
+  translate([
+    0,
+    -(1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - sheet_thickness(hanpose_hpv6_motor_plate_sheet_type),
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* eko8 h */
+  ])
+    rotate([-90, 0, 0])
+    NEMA(hanpose_hpv6_motor_NEMA_type);
+
+  // motor shaft coupler
+  translate([
+    0,
+    -(1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y + 15 /* arbitrary */,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type) + 17 /* eko8 h */
+  ])
+    rotate([-90, 0, 0])
+    shaft_coupling(hanpose_hpv6_motor_coupling_type);
+
+  // rail #1
+  translate([
+    -40,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    rotate([0, 0, 90])
+    rail(hanpose_hpv6_rail_type, hanpose_hpv6_rail_length);
+
+  // rail #2
+  translate([
+    40,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    rotate([0, 0, 90])
+    rail(hanpose_hpv6_rail_type, hanpose_hpv6_rail_length);
+
+  // carriage #1
+  translate([
+    -40,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    rotate([0, 0, 90])
+    carriage(length_axis_rail_carriage_type);
+
+  // carriage #2
+  translate([
+    40,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+    sheet_thickness(width_axis_plate_sheet_type) + extrusion_width(hanpose_hpv6_extrusion_type)
+  ])
+    rotate([0, 0, 90])
+    carriage(length_axis_rail_carriage_type);
+
+  // TODO nut block
+
+  // travel plate
+  translate([
+    0,
+    (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
+    sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height - (1/2) * sheet_thickness(hanpose_hpv6_travel_plate_sheet_type)
+  ])
+    render_2D_sheet(hanpose_hpv6_travel_plate_sheet_type)
+    hanpose_hpv6_travel_plate();
+}
+
+module hanpose_hpv6_travel_plate() {
+  difference() {
+    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
+
+    // screw #1
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #2
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #3
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #4
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #5
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #6
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #7
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #8
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+  }
+}
+
+//! A plate to connect the spindle components, which connects to the width-axis.
+module spindle_plate_dxf() {
+  dxf("spindle_plate");
 
   difference() {
-    cube([40, 40, 40]);
+    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
 
+    // screw #1
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
 
+    // screw #2
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #3
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #4
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #5
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #6
+    translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #7
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screw #8
+    translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
+      circle(r = screw_clearance_radius(M5_cap_screw));
   }
 }
 
-module x_axis_lead_assembly() {
-  // motor
-  translate([-sheet_thickness(sheet_type), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  NEMA(NEMA_type);
+//! A plate to space the spindle plate above the width-axis
+module spindle_plate_spacer_dxf() {
+  dxf("spindle_plate_spacer");
 
-  // motor mount
-  translate([-(1 / 2) * sheet_thickness(sheet_type), 0, 0])
-  rotate([0, -90, 0])
-  render_2D_sheet(sheet_type) x_axis_motor_mount_dxf();
+  difference() {
+    sheet_2D(spindle_plate_spacer_sheet_type, spindle_plate_spacer_size[0], spindle_plate_spacer_size[1], 3);
 
-  // shaft coupling
-  x_axis_lead_shaft_coupling_x = NEMA_shaft_length(NEMA_type) - sheet_thickness(sheet_type);
-  translate([x_axis_lead_shaft_coupling_x, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  shaft_coupling(shaft_coupling_type);
+    // screw #1
+    translate([(1/2) * spindle_plate_spacer_size.x - 10, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
 
-  // leadscrew
-  translate([x_axis_lead_shaft_coupling_x + (1 / 2) * x_axis_leadscrew_length, (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  leadscrew(leadscrew_diameter, x_axis_leadscrew_length, leadscrew_lead, leadscrew_starts); 
+    // screw #2
+    translate([(1/2) * spindle_plate_spacer_size.x - 30, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
 
-  // first support seat
-  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance), 0, beam_width])
-  support_seat_stl();
+    // screw #3
+    translate([-(1/2) * spindle_plate_spacer_size.x + 30, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
 
-  // first, first bearing
-  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance + bb_width(leadscrew_bearing)), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  ball_bearing(leadscrew_bearing);
-
-  // first, second bearing
-  translate([(1 / 2) * (x_axis_leadscrew_length - x_axis_travel_distance - bb_width(leadscrew_bearing) + beam_width), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  ball_bearing(leadscrew_bearing);
-
-  // second support seat
-  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (3 / 4) * beam_width, 0, beam_width])
-  support_seat_stl();
-
-  // second, first bearing
-  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (3 / 4) * beam_width + (1 / 2) * bb_width(leadscrew_bearing), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  ball_bearing(leadscrew_bearing);
-
-  // second, second bearing
-  translate([x_axis_lead_shaft_coupling_x + x_axis_leadscrew_length - (1 / 4) * beam_width - (1 / 2) * bb_width(leadscrew_bearing), (3 / 2) * beam_width, 2 * NEMA_body_radius(NEMA_type)])
-  rotate([0, 90, 0])
-  ball_bearing(leadscrew_bearing);
-}
-
-module x_axis_rail_assembly() {
-  // rail
-  translate([(1 / 2) * x_axis_travel_distance + 2 * beam_width, (1 / 2) * beam_width, beam_width])
-  rail(rail_type, x_axis_travel_distance);
-}
-
-//! This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
-//! 
-//! The necessary X-axis travel distance is equal to the total length divided by the number of spindles, so 2400mm / 6 spindles = 400mm / spindle, so the X-axis linear actuator needs to be able to move at least 400mm.
-module x_axis_assembly()
-assembly("x_axis") {
-  // extrusion: y-length, at x-start
-  translate([beam_width, x_axis_y_length / 2, (1 / 2) * beam_width])
-  rotate([90, 90, 0])
-  extrusion(E4080, x_axis_y_length - 4 * beam_width);
-
-  // extrusion: y-length, at x-end
-  translate([x_axis_x_length - beam_width, x_axis_y_length / 2, (1 / 2) * beam_width])
-  rotate([90, 90, 0])
-  extrusion(E4080, x_axis_y_length - 4 * beam_width);
-
-  // extrusion: x-length, at y-start
-  translate([x_axis_x_length / 2, beam_width, (1 / 2) * beam_width])
-  rotate([0, 90, 0])
-  extrusion(E4080, x_axis_x_length);
-
-  // extrusion: x-length, at y-end
-  translate([x_axis_x_length / 2, beam_width + x_axis_y_length - 2 * beam_width, (1 / 2) * beam_width])
-  rotate([0, 90, 0])
-  extrusion(E4080, x_axis_x_length);
-
-  // x-start, y-start
-  x_axis_rail_assembly();
-  x_axis_lead_assembly();
-
-  // x-end, y-end
-  translate([0, x_axis_y_length, 0])
-  mirror([0, 1, 0])
-  {
-    x_axis_rail_assembly();
-    x_axis_lead_assembly();
+    // screw #4
+    translate([-(1/2) * spindle_plate_spacer_size.x + 10, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
   }
 
-  // x-start, y-end
-  translate([x_axis_x_length, 0, 0])
-  mirror([1, 0, 0])
-  {
-    x_axis_rail_assembly();
-  }
-
-  // x-end, y-end
-  translate([x_axis_x_length, x_axis_y_length, 0])
-  mirror([1, 0, 0])
-  mirror([0, 1, 0])
-  {
-    x_axis_rail_assembly();
-  }
 }
 
-//! This assembly is for a gang of drills on a frame.
+//! This assembly is for a spindle and motor connected via gears.
 //!
-//! The number of drills should be a divisor of the total number of holes per beam (60). So we might start with 6 drills, so 10 holes to be drilled per drill.
-module gang_drill_assembly()
-assembly("gang_drill") {
-  gang_z_frame_length = gang_z_length - 2 * beam_width;
-  gang_y_frame_length = gang_y_length - 2 * beam_width;
+//! - Spindle: [ER20 Spindle Head for Drilling](https://www.aliexpress.com/item/1005001278002287.html)
+//! - Motor: [iHSV57-180 Nema23 180W Integrated Servo Motor](https://www.makerstore.com.au/product/elec-ihsv57-180/)
+module spindle_assembly()
+assembly("spindle") {
+  union() {
+    // spacer #1
+    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+      render_2D_sheet(spindle_plate_spacer_sheet_type)
+      spindle_plate_spacer_dxf();
 
+    // spacer #2
+    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+      render_2D_sheet(spindle_plate_spacer_sheet_type)
+      spindle_plate_spacer_dxf();
 
-  // frame: x-length, y-start
-  translate([(1 / 2) * gang_x_length, -(1 / 2) * beam_width, gang_z_length - beam_width])
-  rotate([90, 0, 0])
-  rotate([0, 90, 0])
-  extrusion(E4080, gang_x_length);
+    // spindle plate
+    translate([0, 0, sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * sheet_thickness(spindle_plate_sheet_type)])
+      render_2D_sheet(spindle_plate_sheet_type)
+      spindle_plate_dxf();
 
-  translate([(1 / 2) * gang_x_length, gang_y_length - (3 / 2) * beam_width, gang_z_length - beam_width])
-  rotate([90, 0, 0])
-  rotate([0, 90, 0])
-  extrusion(E4080, gang_x_length);
-
-  for (i = [0 : gang_drill_count]) {
-    x_offset = i < gang_drill_count
-      ? i * (x_axis_x_length / gang_drill_count)
-      : i * (x_axis_x_length / gang_drill_count) - 2 * beam_width;
-
-    translate([x_offset, 0, 0]) {
-      // frame: z-length, y-start
-      translate([beam_width, -(1 / 2) * beam_width, (1 / 2) * gang_z_frame_length])
+    // spindle
+    translate([0, -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
       rotate([0, 0, 90])
-      extrusion(E4080, gang_z_frame_length);
+      spindle_er20();
+  }
+}
 
-      // frame: z-length, y-end
-      translate([beam_width, x_axis_y_length + (1 / 2) * beam_width, (1 / 2) * gang_z_frame_length])
-      rotate([0, 0, 90])
-      extrusion(E4080, gang_z_frame_length);
-      // frame: y-length
-      translate([(1 / 2) * beam_width, (1 / 2) * gang_y_length - beam_width, gang_z_length - beam_width])
-      rotate([90, 0, 0])
-      extrusion(E4080, gang_y_frame_length);
+//! This assembly is to hold the workpiece: the grid beam.
+module workholding_assembly()
+assembly("workholding") {
+  translate([0, 0, -(1/2) * extrusion_width(workholding_leg_extrusion_type)])
+  union() {
+    for (leg_index = [0 : workholding_leg_count]) {
+      translate([
+        ((leg_index / workholding_leg_count) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_leg_extrusion_type)),
+        0,
+        0
+      ])
+      union() {
+        rotate([0, 90, 90])
+          extrusion(workholding_leg_extrusion_type, workholding_size[1], center = false);
 
-      if (i < gang_drill_count) {
-        translate([4 * beam_width, (1 / 2) * gang_y_length - 2 * beam_width, (1 / 2) * gang_z_length])
-        rotate([0, 0, 180])
-        drill_assembly();
+        translate([
+          0,
+          -(1/2) * extrusion_width(workholding_arm_extrusion_type) + workholding_size[1],
+          (1/2) * extrusion_width(workholding_leg_extrusion_type),
+        ])
+          rotate([0, 0, 90])
+          extrusion(workholding_arm_extrusion_type, workholding_size[2], center = false);
       }
     }
+
+    translate([
+      0,
+      workholding_size[1] - (3/2) * extrusion_width(workholding_arm_extrusion_type),
+      workholding_bed_height
+    ])
+      rotate([0, 90, 0])
+      extrusion(workholding_bed_extrusion_type, workholding_size[0]);
   }
-};
-
-//! This assembly is for a drill.
-//!
-//! Each drill has independent spindle and an independent Z-axis.
-module drill_assembly()
-assembly("drill") {
-  drill_leadscrew_length = drill_z_length + sheet_thickness(sheet_type) - NEMA_shaft_length(NEMA_type);
-
-  // frame
-  translate([(1 / 2) * beam_width, 0, (1 / 2) * drill_z_length])
-  extrusion(E4080, drill_z_length);
-
-  // rail
-  translate([beam_width, -(1 / 2) * beam_width, (1 / 2) * drill_z_length])
-  rotate([0, 90, 0])
-  rail(rail_type, drill_z_length);
-
-  // motor
-  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, drill_z_length + sheet_thickness(sheet_type)])
-  rotate([0, 180, 0])
-  NEMA(NEMA_type);
-
-  // motor mount
-  translate([0, 0, drill_z_length + (1 / 2) * sheet_thickness(sheet_type)])
-  render_2D_sheet(sheet_type) z_axis_motor_mount_dxf();
-
-  // shaft coupling
-  x_axis_lead_shaft_coupling_x = NEMA_shaft_length(NEMA_type) - sheet_thickness(sheet_type);
-  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, drill_z_length + sheet_thickness(sheet_type) - NEMA_shaft_length(NEMA_type)])
-  shaft_coupling(shaft_coupling_type);
-
-  // leadscrew
-  translate([2 * NEMA_body_radius(NEMA_type), (1 / 2) * beam_width, (1 / 2) * drill_leadscrew_length])
-  leadscrew(leadscrew_diameter, drill_leadscrew_length, leadscrew_lead, leadscrew_starts); 
-};
+}
 
 //! Main assembly
 module main_assembly()
 assembly("main") {
-  x_axis_assembly();
-  gang_drill_assembly();
+  translate(length_axis_offset)
+    length_axis_assembly();
+
+  translate(width_axis_offset)
+    width_axis_assembly();
+
+  translate(spindle_offset)
+    spindle_assembly();
+
+  workholding_assembly();
 }
 
-if($preview)
+if($preview) {
   main_assembly();
+}

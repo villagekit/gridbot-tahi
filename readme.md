@@ -1,10 +1,11 @@
 <a name="TOP"></a>
-# Grid-bot
-A multi-spindle single-axis CNC.
+# Gridbot-cad
+A simple open source machine for automated [grid beam](https://gridbeam.xyz) production.
 
-For the framing, we'll use 8040 aluminium extrusion since it's fit for purpose and readily available here in New Zealand.
+Where possible, uses easy-to-source OpenBuilds components (e.g. [MakerStore](https://www.makerstore.com.au/), [BulkMan 3D](https://bulkman3d.com/)) or other readily available standardized parts, following inspiration from open source "pro" consumer CNC machines.
 
-Where possible, we'll try to use motion control components found in "pro" consumer CNC machines (AvidCNC, RoverCNC, QueenBee, etc), e.g. stepper motors, lead screws, linear rails, etc.
+One spindle, two axis of motion (beam-length and beam-width).
+
 
 ![Main Assembly](assemblies/main_assembled.png)
 
@@ -13,10 +14,14 @@ Where possible, we'll try to use motion control components found in "pro" consum
 ---
 ## Table of Contents
 1. [Parts list](#Parts_list)
-1. [Drill Assembly](#drill_assembly)
-1. [Gang Drill Assembly](#gang_drill_assembly)
-1. [X Axis Assembly](#x_axis_assembly)
+1. [Workholding Assembly](#workholding_assembly)
+1. [Spindle Assembly](#spindle_assembly)
+1. [Hanpose Hpv6 Linear Guide Assembly](#hanpose_hpv6_linear_guide_assembly)
+1. [Width Axis Assembly](#width_axis_assembly)
+1. [Length Axis Assembly](#length_axis_assembly)
 1. [Main Assembly](#main_assembly)
+
+
 
 <span></span>
 [Top](#TOP)
@@ -24,136 +29,204 @@ Where possible, we'll try to use motion control components found in "pro" consum
 ---
 <a name="Parts_list"></a>
 ## Parts list
-| <span style="writing-mode: vertical-rl; text-orientation: mixed;">6 x Drill</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Gang&nbsp;Drill</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">X&nbsp;Axis</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span> |  |
-|---:|---:|---:|---:|---:|:---|
-|  |  |  |  | | **Vitamins** |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp; Ball bearing 688ZZZZ 8mm x 16mm x 5mm |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 140mm |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 200mm |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 2400mm |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;7&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;7&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 300mm |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;14&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;14&nbsp; | &nbsp;&nbsp; Extrusion E4080 x 320mm |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Leadscrew 8 x 184mm, 8mm lead, 4 starts |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Leadscrew 8 x 700mm, 8mm lead, 4 starts |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Linear rail HGH20 x 200mm |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Linear rail HGH20 x 600mm |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp; Shaft coupling SC_635x8_rigid |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 51.2mm |
-| &nbsp;&nbsp;30&nbsp; | &nbsp;&nbsp;23&nbsp; | &nbsp;&nbsp;22&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;75&nbsp; | &nbsp;&nbsp;Total vitamins count |
-|  |  |  |  | | **3D printed parts** |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;support_seat.stl |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
-|  |  |  |  | | **CNC routed parts** |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;x_axis_motor_mount.dxf |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;z_axis_motor_mount.dxf |
-| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;Total CNC routed parts count |
+| <span style="writing-mode: vertical-rl; text-orientation: mixed;">Workholding</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Spindle</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Hanpose&nbsp;Hpv6&nbsp;Linear&nbsp;Guide</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Width&nbsp;Axis</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Length&nbsp;Axis</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span> |  |
+|---:|---:|---:|---:|---:|---:|---:|:---|
+|  |  |  |  |  |  | | **Vitamins** |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Aluminium tooling plate 120mm x 100mm x 10mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Aluminium tooling plate 120mm x 20mm x 6mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Aluminium tooling plate 160mm x 144mm x 6mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Bearing EF08  |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Bearing EK08  |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Extrusion E20100 x 270mm |
+| &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Extrusion E2020 x 1500mm |
+| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Extrusion E2040 x 188mm |
+| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Extrusion E2040 x 200mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Extrusion E2080 x 1500mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Leadscrew 8 x 250mm, 10mm lead, 1 starts |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Linear rail HGH15CA x 240mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Linear rail HGH20CA x 1500mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Linear rail carriage HGH20CA |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;50&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;50&nbsp; | &nbsp;&nbsp; Nut M5 sliding T |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;46&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;46&nbsp; | &nbsp;&nbsp; Screw M5 cap x 16mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Screw M5 cs cap x 16mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Shaft coupling SC_635x8_rigid |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Spindle ER20 |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 51.2mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 86mm |
+| &nbsp;&nbsp;13&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;109&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;138&nbsp; | &nbsp;&nbsp;Total vitamins count |
+|  |  |  |  |  |  | | **CNC routed parts** |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;gear_rack_motor_mount_plate.dxf |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;length_axis_plate.dxf |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;spindle_plate.dxf |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;spindle_plate_spacer.dxf |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;width_axis_plate.dxf |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;3&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;Total CNC routed parts count |
+
+
+Hardware design assets and documentation licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), `.scad` files licensed under GPL-3.0 (as with NopSCADlib).
+
+Previous design notes: https://wiki.villagekit.com/en/grid-bot
+
+Inspiration:
+
+- Phil and Richard's multi-spindle drill press: https://youtu.be/PIMESt9iLYg
+- BeamCNC: https://github.com/VladLunachev/BeamCNC/
+- https://wiki.replimat.org/wiki/Automated_drilling_machines
+- https://youtu.be/YmD3KoqatHs
+- https://youtu.be/1WsEdbiqdlA
+- https://youtu.be/ksaT63qqIJM
+- https://youtu.be/h0pohupmKKk
+- https://youtu.be/mg9bALNiYPU
+- https://youtu.be/ocbE4NLd9go
 
 <span></span>
 [Top](#TOP)
 
 ---
-<a name="drill_assembly"></a>
-## 6 x Drill Assembly
+<a name="workholding_assembly"></a>
+## Workholding Assembly
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|6| Extrusion E4080 x 200mm|
-|6| Leadscrew 8 x 184mm, 8mm lead, 4 starts|
-|6| Linear rail HGH20 x 200mm|
-|6| Shaft coupling SC_635x8_rigid|
-|6| Stepper motor NEMA22 x 51.2mm|
+|1| Extrusion E2020 x 1500mm|
+|6| Extrusion E2040 x 188mm|
+|6| Extrusion E2040 x 200mm|
+
+
+### Assembly instructions
+![workholding_assembly](assemblies/workholding_assembly_tn.png)
+
+This assembly is to hold the workpiece: the grid beam.
+
+![workholding_assembled](assemblies/workholding_assembled_tn.png)
+
+<span></span>
+[Top](#TOP)
+
+---
+<a name="spindle_assembly"></a>
+## Spindle Assembly
+### Vitamins
+|Qty|Description|
+|---:|:----------|
+|1| Aluminium tooling plate 120mm x 100mm x 10mm|
+|2| Aluminium tooling plate 120mm x 20mm x 6mm|
+|1| Spindle ER20|
 
 
 ### CNC Routed parts
 
-| 6 x z_axis_motor_mount.dxf |
-|---|
-| ![z_axis_motor_mount.dxf](dxfs/z_axis_motor_mount.png) 
+| 1 x spindle_plate.dxf | 2 x spindle_plate_spacer.dxf |
+|---|---|
+| ![spindle_plate.dxf](dxfs/spindle_plate.png) | ![spindle_plate_spacer.dxf](dxfs/spindle_plate_spacer.png) 
 
 
 
 ### Assembly instructions
-![drill_assembly](assemblies/drill_assembly.png)
+![spindle_assembly](assemblies/spindle_assembly.png)
 
-This assembly is for a drill.
+This assembly is for a spindle and motor connected via gears.
 
-Each drill has independent spindle and an independent Z-axis.
+- Spindle: [ER20 Spindle Head for Drilling](https://www.aliexpress.com/item/1005001278002287.html)
+- Motor: [iHSV57-180 Nema23 180W Integrated Servo Motor](https://www.makerstore.com.au/product/elec-ihsv57-180/)
 
-![drill_assembled](assemblies/drill_assembled.png)
+![spindle_assembled](assemblies/spindle_assembled.png)
 
 <span></span>
 [Top](#TOP)
 
 ---
-<a name="gang_drill_assembly"></a>
-## Gang Drill Assembly
+<a name="hanpose_hpv6_linear_guide_assembly"></a>
+## Hanpose Hpv6 Linear Guide Assembly
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|2| Extrusion E4080 x 2400mm|
-|7| Extrusion E4080 x 300mm|
-|14| Extrusion E4080 x 320mm|
+|1| Aluminium tooling plate 120mm x 100mm x 10mm|
+|1| Bearing EF08 |
+|1| Bearing EK08 |
+|1| Extrusion E20100 x 270mm|
+|1| Leadscrew 8 x 250mm, 10mm lead, 1 starts|
+|2| Linear rail HGH15CA x 240mm|
+|2| Linear rail carriage HGH20CA|
+|1| Shaft coupling SC_635x8_rigid|
+|1| Stepper motor NEMA22 x 51.2mm|
+
+
+### Assembly instructions
+![hanpose_hpv6_linear_guide_assembly](assemblies/hanpose_hpv6_linear_guide_assembly_tn.png)
+
+Hanpose HPV6: https://www.aliexpress.com/item/32908794883.html
+
+![hanpose_hpv6_linear_guide_assembled](assemblies/hanpose_hpv6_linear_guide_assembled_tn.png)
+
+<span></span>
+[Top](#TOP)
+
+---
+<a name="width_axis_assembly"></a>
+## Width Axis Assembly
+### Vitamins
+|Qty|Description|
+|---:|:----------|
+|1| Aluminium tooling plate 160mm x 144mm x 6mm|
+
+
+### CNC Routed parts
+
+| 1 x width_axis_plate.dxf |
+|---|
+| ![width_axis_plate.dxf](dxfs/width_axis_plate.png) 
+
 
 
 ### Sub-assemblies
 
-| 6 x drill_assembly |
+| 1 x hanpose_hpv6_linear_guide_assembly |
 |---|
-| ![drill_assembled](assemblies/drill_assembled_tn.png) 
+| ![hanpose_hpv6_linear_guide_assembled](assemblies/hanpose_hpv6_linear_guide_assembled_tn.png) 
 
 
 
 ### Assembly instructions
-![gang_drill_assembly](assemblies/gang_drill_assembly.png)
+![width_axis_assembly](assemblies/width_axis_assembly.png)
 
-This assembly is for a gang of drills on a frame.
+This assembly is for the axis that will travel perpendicular to the length of the grid beam (i.e. along the width of the grid beam).
 
-The number of drills should be a divisor of the total number of holes per beam (60). So we might start with 6 drills, so 10 holes to be drilled per drill.
-
-![gang_drill_assembled](assemblies/gang_drill_assembled.png)
+![width_axis_assembled](assemblies/width_axis_assembled.png)
 
 <span></span>
 [Top](#TOP)
 
 ---
-<a name="x_axis_assembly"></a>
-## X Axis Assembly
+<a name="length_axis_assembly"></a>
+## Length Axis Assembly
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|8| Ball bearing 688ZZZZ 8mm x 16mm x 5mm|
-|2| Extrusion E4080 x 140mm|
-|2| Extrusion E4080 x 2400mm|
-|2| Leadscrew 8 x 700mm, 8mm lead, 4 starts|
-|4| Linear rail HGH20 x 600mm|
-|2| Shaft coupling SC_635x8_rigid|
-|2| Stepper motor NEMA22 x 51.2mm|
-
-
-### 3D Printed parts
-
-| 4 x support_seat.stl |
-|---|
-| ![support_seat.stl](stls/support_seat.png) 
-
+|1| Aluminium tooling plate 160mm x 144mm x 6mm|
+|1| Extrusion E2080 x 1500mm|
+|2| Linear rail HGH20CA x 1500mm|
+|4| Linear rail carriage HGH20CA|
+|50| Nut M5 sliding T|
+|46| Screw M5 cap x 16mm|
+|4| Screw M5 cs cap x 16mm|
+|1| Stepper motor NEMA22 x 86mm|
 
 
 ### CNC Routed parts
 
-| 2 x x_axis_motor_mount.dxf |
-|---|
-| ![x_axis_motor_mount.dxf](dxfs/x_axis_motor_mount.png) 
+| 1 x gear_rack_motor_mount_plate.dxf | 1 x length_axis_plate.dxf |
+|---|---|
+| ![gear_rack_motor_mount_plate.dxf](dxfs/gear_rack_motor_mount_plate.png) | ![length_axis_plate.dxf](dxfs/length_axis_plate.png) 
 
 
 
 ### Assembly instructions
-![x_axis_assembly](assemblies/x_axis_assembly.png)
+![length_axis_assembly](assemblies/length_axis_assembly.png)
 
-This assembly, between the bed and the table, allows the machine to move the material in the X-axis while the spindles move in the Z-axis.
+This assembly is for the axis that will travel along the length of the grid beam.
 
-The necessary X-axis travel distance is equal to the total length divided by the number of spindles, so 2400mm / 6 spindles = 400mm / spindle, so the X-axis linear actuator needs to be able to move at least 400mm.
-
-![x_axis_assembled](assemblies/x_axis_assembled.png)
+![length_axis_assembled](assemblies/length_axis_assembled.png)
 
 <span></span>
 [Top](#TOP)
@@ -163,9 +236,14 @@ The necessary X-axis travel distance is equal to the total length divided by the
 ## Main Assembly
 ### Sub-assemblies
 
-| 1 x gang_drill_assembly | 1 x x_axis_assembly |
-|---|---|
-| ![gang_drill_assembled](assemblies/gang_drill_assembled_tn.png) | ![x_axis_assembled](assemblies/x_axis_assembled_tn.png) 
+| 1 x length_axis_assembly | 1 x spindle_assembly | 1 x width_axis_assembly |
+|---|---|---|
+| ![length_axis_assembled](assemblies/length_axis_assembled_tn.png) | ![spindle_assembled](assemblies/spindle_assembled_tn.png) | ![width_axis_assembled](assemblies/width_axis_assembled_tn.png) 
+
+
+| 1 x workholding_assembly |
+|---|
+| ![workholding_assembled](assemblies/workholding_assembled_tn.png) 
 
 
 

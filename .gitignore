@@ -6,3 +6,4 @@ deps
 *.deps
 /bom
 /scad/bom.scad
+NOTES.md
