@@ -70,9 +70,10 @@ Previous design notes: https://wiki.villagekit.com/en/grid-bot
 Inspiration:
 
 - Phil and Richard's multi-spindle drill press: https://youtu.be/PIMESt9iLYg
+- BeamCNC: https://github.com/VladLunachev/BeamCNC/
+- https://wiki.replimat.org/wiki/Automated_drilling_machines
 - https://youtu.be/YmD3KoqatHs
 - https://youtu.be/1WsEdbiqdlA
-- https://wiki.replimat.org/wiki/Automated_drilling_machines
 - https://youtu.be/ksaT63qqIJM
 - https://youtu.be/h0pohupmKKk
 - https://youtu.be/mg9bALNiYPU
