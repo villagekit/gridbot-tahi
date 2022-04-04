@@ -12,6 +12,7 @@ SC_635x8_rigid  = [ "SC_635x8_rigid",    25, 12.5, 6.35,   8 ];
 
 // extrusions
 E20100  = [ "E20100", 20, 100,  -4.2,   -3,   8,    6, 12.0,   2,   2, 1,   false ];
+E20C = ["E20C", 40, 80, -4.2, -3, 8, 6, 12.0, 2, 2, 1, false ];
 
 // sheets
 AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1    ], false];
@@ -20,6 +21,28 @@ AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1   
 //                                                                corner  body    boss    boss          shaft               cap         thread black  end    shaft    shaft
 //                                                  side, length, radius, radius, radius, depth, shaft, length,      holes, heights,    dia,   caps,  conn,  length2, bore
 NEMA23_HG86001Y21B     = ["NEMA23_HG86001Y21B",     56.4, 86,     75.7/2, 35,   38.1/2, 1.6,   6.35,    21,        47.1,    [8,     8], 3,     false, false, 0,       0];
+
+module extrusion_cbeam(type, length, center = true) {
+  vitamin(str("extrusion_cbeam(", type[0], length, "): Extrusion C-Beam ", type[0], " x ", length, "mm"));
+
+  bottom_extrusion_type = [type[0] + "-bottom", type[1] / 2, type[2], type[3], type[4], type[5], type[6], type[7], type[8], type[9], type[10], type[11]];
+  side_extrusion_type = [type[0] + "-side", type[1] / 2, type[2] / 2, type[3], type[4], type[5], type[6], type[7], type[8], type[9], type[10], type[11]];
+
+  color(grey(90))
+    linear_extrude(length, center = center, convexity = 8)
+    union() {
+      translate([(1/4) * type[1], 0, 0])
+        extrusion_cross_section(bottom_extrusion_type, false);
+
+      translate([0, (3/4) * type[1], 0])
+        rotate([0, 0, 90])
+        extrusion_cross_section(side_extrusion_type, false);
+
+      translate([0, -(3/4) * type[1], 0])
+        rotate([0, 0, 90])
+        extrusion_cross_section(side_extrusion_type, false);
+    }
+}
 
 // https://www.hiwin.de/en/Products/Bearing/Bearings-EK-EF/EK/EK08-C5/p/18-000428
 // https://salecnc.net/pictures/cnc_accessories/hose/imageSaleCNC/CNC%20PARTS/Ballscrew%20&%20Support/Web%20image/Support%20EK,%20EF/1.EK08%20&%20EF08%20Set%20Ball%20Screw%20Support/2.EK08%20&%20EF08%20Set%20Ball%20Screw%20Support.jpg
