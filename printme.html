@@ -1,9 +1,8 @@
 <p><a name="TOP"></a></p>
-<h1>Gridbot-ez-cad</h1>
+<h1>Gridbot-cad</h1>
 <p>A simple open source machine for automated <a href="https://gridbeam.xyz">grid beam</a> production.</p>
 <p>Where possible, uses easy-to-source OpenBuilds components (e.g. <a href="https://www.makerstore.com.au/">MakerStore</a>, <a href="https://bulkman3d.com/">BulkMan 3D</a>) or other readily available standardized parts, following inspiration from open source "pro" consumer CNC machines.</p>
 <p>One spindle, two axis of motion (beam-length and beam-width).</p>
-<p>Hardware design assets and documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, <code>.scad</code> files licensed under GPL-3.0 (as with NopSCADlib).</p>
 <p><img alt="Main Assembly" src="assemblies/main_assembled.png" /></p>
 <div style="page-break-after: always;"></div>
 <h2>Table of Contents</h2>
@@ -102,6 +101,36 @@
 <td align="right">&nbsp;&nbsp;.&nbsp;</td>
 <td align="right">&nbsp;&nbsp;1&nbsp;</td>
 <td align="left">&nbsp;&nbsp; Extrusion E20100 x 270mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;1&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;1&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E2020 x 1500mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E2040 x 188mm</td>
+</tr>
+<tr>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;6&nbsp;</td>
+<td align="left">&nbsp;&nbsp; Extrusion E2040 x 200mm</td>
 </tr>
 <tr>
 <td align="right">&nbsp;&nbsp;.&nbsp;</td>
@@ -224,13 +253,13 @@
 <td align="left">&nbsp;&nbsp; Stepper motor NEMA22 x 86mm</td>
 </tr>
 <tr>
-<td align="right">&nbsp;&nbsp;.&nbsp;</td>
+<td align="right">&nbsp;&nbsp;13&nbsp;</td>
 <td align="right">&nbsp;&nbsp;4&nbsp;</td>
 <td align="right">&nbsp;&nbsp;11&nbsp;</td>
 <td align="right">&nbsp;&nbsp;1&nbsp;</td>
 <td align="right">&nbsp;&nbsp;109&nbsp;</td>
 <td align="right">&nbsp;&nbsp;.&nbsp;</td>
-<td align="right">&nbsp;&nbsp;125&nbsp;</td>
+<td align="right">&nbsp;&nbsp;138&nbsp;</td>
 <td align="left">&nbsp;&nbsp;Total vitamins count</td>
 </tr>
 <tr>
@@ -305,9 +334,45 @@
 </tr>
 </tbody>
 </table>
+<p>Hardware design assets and documentation licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, <code>.scad</code> files licensed under GPL-3.0 (as with NopSCADlib).</p>
+<p>Previous design notes: https://wiki.villagekit.com/en/grid-bot</p>
+<p>Inspiration:</p>
+<ul>
+<li>Phil and Richard's multi-spindle drill press: https://youtu.be/PIMESt9iLYg</li>
+<li>https://youtu.be/YmD3KoqatHs</li>
+<li>https://youtu.be/1WsEdbiqdlA</li>
+<li>https://wiki.replimat.org/wiki/Automated_drilling_machines</li>
+<li>https://youtu.be/ksaT63qqIJM</li>
+<li>https://youtu.be/h0pohupmKKk</li>
+<li>https://youtu.be/mg9bALNiYPU</li>
+<li>https://youtu.be/ocbE4NLd9go</li>
+</ul>
 <div style="page-break-after: always;"></div>
 <p><a name="workholding_assembly"></a></p>
 <h2>Workholding Assembly</h2>
+<h3>Vitamins</h3>
+<table>
+<thead>
+<tr>
+<th align="right">Qty</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">1</td>
+<td align="left">Extrusion E2020 x 1500mm</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Extrusion E2040 x 188mm</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td align="left">Extrusion E2040 x 200mm</td>
+</tr>
+</tbody>
+</table>
 <h3>Assembly instructions</h3>
 <p><img alt="workholding_assembly" src="assemblies/workholding_assembly_tn.png" /></p>
 <p>This assembly is to hold the workpiece: the grid beam.</p>

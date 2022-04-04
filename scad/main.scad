@@ -10,7 +10,24 @@
 //!
 //! One spindle, two axis of motion (beam-length and beam-width).
 //!
+//! ***
+//! 
+//! ***
+//!
 //! Hardware design assets and documentation licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), `.scad` files licensed under GPL-3.0 (as with NopSCADlib).
+//!
+//! Previous design notes: https://wiki.villagekit.com/en/grid-bot
+//!
+//! Inspiration:
+//!
+//! - Phil and Richard's multi-spindle drill press: https://youtu.be/PIMESt9iLYg
+//! - https://youtu.be/YmD3KoqatHs
+//! - https://youtu.be/1WsEdbiqdlA
+//! - https://wiki.replimat.org/wiki/Automated_drilling_machines
+//! - https://youtu.be/ksaT63qqIJM
+//! - https://youtu.be/h0pohupmKKk
+//! - https://youtu.be/mg9bALNiYPU
+//! - https://youtu.be/ocbE4NLd9go
 
 include <NopSCADlib/lib.scad> 
 
