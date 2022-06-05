@@ -15,6 +15,7 @@ SC_635x8_rigid  = [ "SC_635x8_rigid",    25, 12.5, 6.35,   8 ];
 
 // extrusions
 E20100  = [ "E20100", 20, 100,  -4.2,   -3,   8,    6, 12.0,   2,   2, 1,   false ];
+E4040S  = [ "E4040S", 40, 40,  -4.2,   -3,   8,    6, 12.0,   2,   2, 1,   false ];
 E20C = ["E20C", 40, 80, -4.2, -3, 8, 6, 12.0, 2, 2, 1, false ];
 
 // sheets
@@ -45,6 +46,23 @@ module extrusion_cbeam(type, length, center = true) {
       translate([0, -(3/4) * type[1], 0])
         rotate([0, 0, 90])
         extrusion_cross_section(side_extrusion_type, false);
+    }
+}
+
+module extrusion_4040(type, length, center = true) {
+  vitamin(str("extrusion_4040(", type[0], length, "): Extrusion 4040 ", type[0], " x ", length, "mm"));
+
+  top_extrusion_type = [type[0] + "-top", type[1] / 2, type[2], type[3], type[4], type[5], type[6], type[7], type[8], type[9], type[10], type[11]];
+  bottom_extrusion_type = [type[0] + "-bottom", type[1] / 2, type[2], type[3], type[4], type[5], type[6], type[7], type[8], type[9], type[10], type[11]];
+
+  color(grey(90))
+    linear_extrude(length, center = center, convexity = 8)
+    union() {
+      translate([(1/4) * type[1], 0, 0])
+        extrusion_cross_section(top_extrusion_type, false);
+
+      translate([-(1/4) * type[1], 0, 0])
+        extrusion_cross_section(bottom_extrusion_type, false);
     }
 }
 
