@@ -110,15 +110,24 @@ hanpose_hpv6_motor_NEMA_type = NEMA23_51;
 hanpose_hpv6_motor_plate_sheet_type = AL10;
 hanpose_hpv6_motor_coupling_type = SC_635x8_rigid;
 hanpose_hpv6_height = 63;
+hanpose_hpv6_travel_plate_spacer_height = hanpose_hpv6_height - (extrusion_width(hanpose_hpv6_extrusion_type) + carriage_height(hanpose_hpv6_carriage_type) + sheet_thickness(hanpose_hpv6_travel_plate_sheet_type));
 
 spindle_plate_sheet_type = AL6;
 spindle_plate_spacer_sheet_type = AL6;
 spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
 spindle_motor_NEMA_type = NEMA23_51;
+spindle_plate_size = [
+  150,
+  150,
+];
 spindle_offset = [
   width_axis_offset[0],
   width_axis_offset[1] + (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
   width_axis_offset[2] + sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height
+];
+spindle_drill_offset = [
+  -40,
+  -50
 ];
 spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_sheet_type) + sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * spindle_er20_height;
 
@@ -681,6 +690,8 @@ assembly("hanpose_hpv6_linear_guide") {
     carriage(length_axis_rail_carriage_type);
 
   // TODO nut block
+  
+  // TODO travel plate spacer
 
   // travel plate
   translate([
@@ -735,7 +746,11 @@ module spindle_plate_dxf() {
   dxf("spindle_plate");
 
   difference() {
-    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
+    translate([
+      0,
+      (1/2) * (hanpose_hpv6_travel_plate_size[1] - spindle_plate_size[1]),
+    ])
+      sheet_2D(spindle_plate_sheet_type, spindle_plate_size[0], spindle_plate_size[1], 3);
 
     // screw #1
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
@@ -820,7 +835,7 @@ assembly("spindle") {
       spindle_plate_dxf();
 
     // spindle
-    translate([0, -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
+    translate([spindle_drill_offset[0], spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
       rotate([0, 0, 90])
       spindle_er20();
   }
