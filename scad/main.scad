@@ -36,7 +36,7 @@ include <./lib.scad>
 
 // $show_threads = true;
 
-length_axis_extrusion_type = E20C;
+length_axis_extrusion_type = E2080;
 length_axis_length = 1500;
 length_axis_rail_type = HGH20CA;
 length_axis_rail_carriage_type = HGH20CA_carriage;
@@ -109,7 +109,7 @@ spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_s
 
 workholding_bed_height = spindle_drill_point_height - 20;
 workholding_leg_count = 5;
-workholding_leg_extrusion_type = E4040S;
+workholding_leg_extrusion_type = E2040;
 workholding_arm_extrusion_type = E2040;
 workholding_size = [
   length_axis_length,
@@ -401,7 +401,7 @@ assembly("length_axis") {
     (1/2) * extrusion_width(length_axis_extrusion_type)
   ])
     rotate([0, -90, 0])
-    extrusion_cbeam(length_axis_extrusion_type, length_axis_length);
+    extrusion(length_axis_extrusion_type, length_axis_length);
 
   // rail #1
   translate([0, 10, 0])
@@ -700,7 +700,7 @@ assembly("workholding") {
       ])
       union() {
         rotate([0, 90, 90])
-          extrusion_4040(workholding_leg_extrusion_type, workholding_size[1], center = false);
+          extrusion(workholding_leg_extrusion_type, workholding_size[1], center = false);
 
         translate([
           0,
