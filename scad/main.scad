@@ -109,13 +109,14 @@ spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_s
 
 workholding_bed_height = spindle_drill_point_height - 20;
 workholding_leg_count = 5;
-workholding_leg_extrusion_type = E2040;
-workholding_arm_extrusion_type = E2040;
+workholding_leg_height = 120;
+workholding_extrusion_type = E2040;
 workholding_size = [
   length_axis_length,
   200,
-  workholding_bed_height + 40,
+  ceil_to(workholding_leg_height + workholding_bed_height + 40, 40)
 ];
+echo("workholding_size", workholding_size);
 workholding_bed_extrusion_type = E2020;
 
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
@@ -687,34 +688,43 @@ assembly("spindle") {
   }
 }
 
-//! This assembly is to hold the workpiece: the grid beam.
+//! This assembly is to hold the workpiece (the grid beam) and the rest of the machine.
 module workholding_assembly()
 assembly("workholding") {
-  translate([0, 0, -(1/2) * extrusion_width(workholding_leg_extrusion_type)])
+  translate([0, 0, -(1/2) * extrusion_width(workholding_extrusion_type)])
   union() {
     for (leg_index = [0 : workholding_leg_count]) {
       translate([
-        ((leg_index / workholding_leg_count) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_leg_extrusion_type)),
+        ((leg_index / workholding_leg_count) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_extrusion_type)),
         0,
-        0
+        0,
       ])
       union() {
+        translate([0, extrusion_width(workholding_extrusion_type), 0])
         rotate([0, 90, 90])
-          extrusion(workholding_leg_extrusion_type, workholding_size[1], center = false);
+          extrusion(workholding_extrusion_type, workholding_size[1] - 2 * extrusion_width(workholding_extrusion_type), center = false);
 
         translate([
           0,
-          -(1/2) * extrusion_width(workholding_arm_extrusion_type) + workholding_size[1],
-          (1/2) * extrusion_width(workholding_leg_extrusion_type),
+          -(1/2) * extrusion_width(workholding_extrusion_type) + workholding_size[1],
+          (1/2) * extrusion_width(workholding_extrusion_type) - workholding_leg_height,
         ])
           rotate([0, 0, 90])
-          extrusion(workholding_arm_extrusion_type, workholding_size[2], center = false);
+          extrusion(workholding_extrusion_type, workholding_size[2], center = false);
+
+        translate([
+          0,
+          (1/2) * extrusion_width(workholding_extrusion_type),
+          (1/2) * extrusion_width(workholding_extrusion_type) - workholding_leg_height,
+        ])
+          rotate([0, 0, 90])
+          extrusion(workholding_extrusion_type, workholding_leg_height, center = false);
       }
     }
 
     translate([
       0,
-      workholding_size[1] - (3/2) * extrusion_width(workholding_arm_extrusion_type),
+      workholding_size[1] - (3/2) * extrusion_width(workholding_extrusion_type),
       workholding_bed_height
     ])
       rotate([0, 90, 0])
