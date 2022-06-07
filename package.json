@@ -1,5 +1,5 @@
 {
-  "name": "@villagekit/grid-bot",
+  "name": "@villagekit/gridbot-cad",
   "version": "0.0.0",
   "description": "",
   "scripts": {
@@ -9,13 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/villagekit/grid-bot.git"
+    "url": "git+https://github.com/villagekit/gridbot-cad.git"
   },
   "keywords": [],
   "author": "Village Kit Limited",
   "license": "",
   "bugs": {
-    "url": "https://github.com/villagekit/grid-bot/issues"
+    "url": "https://github.com/villagekit/gridbot-cad/issues"
   },
-  "homepage": "https://github.com/villagekit/grid-bot#readme"
+  "homepage": "https://github.com/villagekit/gridbot-cad#readme"
 }

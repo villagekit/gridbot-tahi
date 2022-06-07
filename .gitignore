@@ -1,5 +1,6 @@
 *.log
 *.echo
+*_diff.png
 times.txt
 bounds.json
 deps
