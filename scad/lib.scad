@@ -1,3 +1,5 @@
+include <./joining-plates.scad>;
+
 // ball bearings
 BB688ZZ =  ["688ZZ", 8,  16,  5,   "silver",    1.5, 1.5];
 
@@ -15,6 +17,7 @@ E20100  = [ "E20100", 20, 100,  -4.2,   -3,   8,    6, 12.0,   2,   2, 1,   fals
 E20C = ["E20C", 40, 80, -4.2, -3, 8, 6, 12.0, 2, 2, 1, false ];
 
 // sheets
+AL4        = [ "AL4",        "Aluminium tooling plate", 4, [0.9, 0.9, 0.9, 1    ], false];
 AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1    ], false];
 
 // stepper motors
