@@ -209,5 +209,3 @@ module spindle_er20() {
     }
   }
 }
-
-

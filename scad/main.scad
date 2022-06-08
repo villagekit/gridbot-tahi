@@ -700,10 +700,12 @@ assembly("workholding") {
         0,
       ])
       union() {
+        // extrusion #1: horizontal
         translate([0, extrusion_width(workholding_extrusion_type), 0])
         rotate([0, 90, 90])
           extrusion(workholding_extrusion_type, workholding_size[1] - 2 * extrusion_width(workholding_extrusion_type), center = false);
 
+        // extrusion #2: vertical
         translate([
           0,
           -(1/2) * extrusion_width(workholding_extrusion_type) + workholding_size[1],
@@ -712,6 +714,7 @@ assembly("workholding") {
           rotate([0, 0, 90])
           extrusion(workholding_extrusion_type, workholding_size[2], center = false);
 
+        // extrusion #3: vertical
         translate([
           0,
           (1/2) * extrusion_width(workholding_extrusion_type),
@@ -719,6 +722,24 @@ assembly("workholding") {
         ])
           rotate([0, 0, 90])
           extrusion(workholding_extrusion_type, workholding_leg_height, center = false);
+
+        // joining plate: 23a, connect extrusion #2 and #3
+        translate([
+          extrusion_width(workholding_extrusion_type) + joining_plate_thickness(jp_5_hole_90d),
+          -(1/2) * extrusion_width(workholding_extrusion_type) + workholding_size[1],
+          0,
+        ])
+        rotate([180, 90, 0])
+        joining_plate(jp_5_hole_t);
+
+        // joining plate: 23b, connect extrusion #2 and #3
+        translate([
+          -extrusion_width(workholding_extrusion_type),
+          -(1/2) * extrusion_width(workholding_extrusion_type) + workholding_size[1],
+          0,
+        ])
+        rotate([180, 90, 0])
+          joining_plate(jp_5_hole_t);
       }
     }
 
