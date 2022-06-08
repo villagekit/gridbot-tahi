@@ -108,7 +108,7 @@ module l_bracket_heightwise_hole_positions(type) {
 
 module l_bracket_screws(type) {
   l_bracket_hole_positions(type)
-    screw(l_bracket_screw_type(type), l_bracket_thickness_height(type) + 5);
+    screw(l_bracket_screw_type(type), l_bracket_thickness(type) + 5);
 }
 
 module l_bracket_tnuts(type) {
