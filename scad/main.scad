@@ -769,7 +769,6 @@ assembly("workholding") {
         l_bracket_screws(lb_double);
         l_bracket_tnuts(lb_double);
       }
-
     }
 
     translate([
@@ -782,16 +781,48 @@ assembly("workholding") {
   }
 }
 
-module workholding_leg_positions() {
+module interconnect_workholding_and_length_axis() {
+  workholding_leg_positions(skip_last = true)
+  translate([
+    extrusion_width(workholding_extrusion_type),
+    2 * extrusion_width(workholding_extrusion_type),
+    (1/2) * extrusion_width(workholding_extrusion_type),
+  ])
+  rotate([180, 0, 0])
+  union() {
+    l_bracket(lb_double);
+    l_bracket_screws(lb_double);
+    l_bracket_tnuts(lb_double);
+  }
+
+  workholding_leg_positions(skip_first = true)
+  translate([
+    -extrusion_width(workholding_extrusion_type),
+    0,
+    (1/2) * extrusion_width(workholding_extrusion_type),
+  ])
+  rotate([0, 180, 0])
+  union() {
+    l_bracket(lb_double);
+    l_bracket_screws(lb_double);
+    l_bracket_tnuts(lb_double);
+  }
+}
+
+module workholding_leg_positions(skip_first = false, skip_last = false) {
   translate([0, 0, -(1/2) * extrusion_width(workholding_extrusion_type)])
   union() {
     for (leg_index = [0 : workholding_leg_count - 1]) {
-      translate([
-        ((leg_index / (workholding_leg_count - 1)) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_extrusion_type)),
-        0,
-        0,
-      ])
-      children();
+      if (leg_index == 0 && skip_first == true) {}
+      else if (leg_index == workholding_leg_count - 1 && skip_last == true) {}
+      else {
+        translate([
+          ((leg_index / (workholding_leg_count - 1)) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_extrusion_type)),
+          0,
+          0,
+        ])
+        children();
+      }
     }
   }
 }
@@ -800,15 +831,16 @@ module workholding_leg_positions() {
 module main_assembly()
 assembly("main") {
   translate(length_axis_offset)
-    length_axis_assembly();
+  length_axis_assembly();
 
   translate(width_axis_offset)
-    width_axis_assembly();
+  width_axis_assembly();
 
   translate(spindle_offset)
-    spindle_assembly();
+  spindle_assembly();
 
   workholding_assembly();
+  interconnect_workholding_and_length_axis();
 }
 
 if($preview) {
