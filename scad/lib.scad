@@ -26,6 +26,9 @@ AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1   
 //                                                  side, length, radius, radius, radius, depth, shaft, length,      holes, heights,    dia,   caps,  conn,  length2, bore
 NEMA23_HG86001Y21B     = ["NEMA23_HG86001Y21B",     56.4, 86,     75.7/2, 35,   38.1/2, 1.6,   6.35,    21,        47.1,    [8,     8], 3,     false, false, 0,       0];
 
+
+function ceil_to(value, multiple) = ceil(value / multiple) * multiple;
+
 module extrusion_cbeam(type, length, center = true) {
   vitamin(str("extrusion_cbeam(", type[0], length, "): Extrusion C-Beam ", type[0], " x ", length, "mm"));
 
