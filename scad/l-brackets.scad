@@ -10,7 +10,10 @@ function l_bracket_thickness(type) = type[5];
 function l_bracket_lengthwise_hole_positions_list(type) = type[6];
 function l_bracket_heightwise_hole_positions_list(type) = type[7];
 function l_bracket_offset(type) = type[8];
-function l_bracket_hole_radius(type) = type[9];
+function l_bracket_screw_type(type) = type[9];
+function l_bracket_tnut(type) = type[10];
+
+function l_bracket_hole_radius(type) = screw_clearance_radius(l_bracket_screw_type(type));
 
 lb_single = [
   "Single",
@@ -22,7 +25,8 @@ lb_single = [
   [[15, 7.25]],
   [[10, 7.25]],
   [0, 2.75],
-  M5_clearance_radius,
+  M5_cap_screw,
+  M5_sliding_t_nut,
 ];
 
 lb_double = [
@@ -35,7 +39,8 @@ lb_double = [
   [[15, 9], [15, 29]],
   [[10, 9], [10, 29]],
   [0, 1],
-  M5_clearance_radius,
+  M5_cap_screw,
+  M5_sliding_t_nut,
 ];
 
 lb_triple = [
@@ -49,7 +54,8 @@ lb_triple = [
   [[10, 9.8], [10, 29.8], [10, 49.8]],
   [15, 9.8],
   [0, 0.2],
-  M5_clearance_radius,
+  M5_cap_screw,
+  M5_sliding_t_nut,
 ];
 
 module l_bracket(type) {
@@ -71,22 +77,44 @@ module l_bracket(type) {
     }
 
     l_bracket_hole_positions(type)
+      translate([0, 0, -eps])
       cylinder(r = l_bracket_hole_radius(type), h = inf);
   }
 }
 
 module l_bracket_hole_positions(type) {
-  for (position = l_bracket_lengthwise_hole_positions_list(type)) {
-    translate(position)
-    translate([0, 0, -eps])
-      children();
-  }
+  l_bracket_lengthwise_hole_positions(type)
+    children();
 
-  for (position = l_bracket_heightwise_hole_positions_list(type)) {
-    mirror([1, 0, 0])
-    rotate([0, -90, 0])
-    translate([0, 0, -eps])
+  l_bracket_heightwise_hole_positions(type)
+    children();
+}
+
+module l_bracket_lengthwise_hole_positions(type) {
+  for (position = l_bracket_lengthwise_hole_positions_list(type)) {
     translate(position)
       children();
   }
 }
+
+module l_bracket_heightwise_hole_positions(type) {
+  for (position = l_bracket_heightwise_hole_positions_list(type)) {
+    mirror([1, 0, 0])
+    rotate([0, -90, 0])
+    translate(position)
+      children();
+  }
+}
+
+module l_bracket_screws(type) {
+  l_bracket_hole_positions(type)
+    screw(l_bracket_screw_type(type), l_bracket_thickness_height(type) + 5);
+}
+
+module l_bracket_tnuts(type) {
+  l_bracket_hole_positions(type)
+    translate([0, 0, -2])
+    mirror([0, 0, 1])
+    sliding_t_nut(l_bracket_tnut(type));
+}
+
