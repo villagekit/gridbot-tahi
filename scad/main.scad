@@ -108,7 +108,7 @@ spindle_offset = [
 spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_sheet_type) + sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * spindle_er20_height;
 
 workholding_bed_height = spindle_drill_point_height - 20;
-workholding_leg_count = 5;
+workholding_leg_count = 3;
 workholding_leg_height = 120;
 workholding_extrusion_type = E2040;
 workholding_size = [
