@@ -693,9 +693,9 @@ module workholding_assembly()
 assembly("workholding") {
   translate([0, 0, -(1/2) * extrusion_width(workholding_extrusion_type)])
   union() {
-    for (leg_index = [0 : workholding_leg_count]) {
+    for (leg_index = [0 : workholding_leg_count - 1]) {
       translate([
-        ((leg_index / workholding_leg_count) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_extrusion_type)),
+        ((leg_index / (workholding_leg_count - 1)) - (1/2)) * (workholding_size[0] - extrusion_height(workholding_extrusion_type)),
         0,
         0,
       ])
