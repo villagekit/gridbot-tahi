@@ -1,5 +1,6 @@
 include <./joining-plates.scad>;
 include <./l-brackets.scad>;
+include <./rack-and-pinion.scad>;
 
 // ball bearings
 BB688ZZ =  ["688ZZ", 8,  16,  5,   "silver",    1.5, 1.5];

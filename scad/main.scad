@@ -244,125 +244,6 @@ module width_axis_plate_dxf() {
   }
 }
 
-
-//! Via MakerStore: https://www.makerstore.com.au/product/plate-motor-rack/
-module gear_rack_motor_mount_plate_dxf() {
-  dxf("gear_rack_motor_mount_plate");
-
-  NEMA_type = length_axis_motor_NEMA_type;
-
-  translate([-65, 0])
-  difference() {
-    hull() {
-      // bottom
-      circle(r = 5);
-
-      // bottom right
-      translate([30, 30])
-        circle(r = 5);
-
-      // bottom left
-      translate([30, -30])
-        circle(r = 5);
-
-      // top
-      translate([130, 0])
-        circle(r = 5);
-
-      // top right
-      translate([100, 30])
-        circle(r = 5);
-
-      // top left
-      translate([100, -30])
-        circle(r = 5);
-    }
-
-    // motor
-    translate([65, 0])
-      union() {
-        // big hole
-        circle(r = NEMA_big_hole(NEMA_type));
-
-        // screw holes
-        NEMA_screw_positions(NEMA_type)
-          circle(d = NEMA_thread_d(NEMA_type));
-      }
-
-    // bottom row #1, item #1
-    translate([10, 0])
-      circle(d = 5.1);
-
-    // bottom row #2, item #1
-    translate([20, -10])
-      circle(d = 5.1);
-
-    // bottom row #2, item #2
-    translate([20, 0])
-      circle(d = 5.1);
-
-    // bottom row #2, item #3
-    translate([20, 10])
-      circle(d = 5.1);
-
-    // bottom row #3, item #1
-    translate([30, -20])
-      circle(d = 5.1);
-
-    // bottom row #3, item #2
-    translate([30, -10])
-      circle(d = 5.1);
-
-    // bottom row #3, item #3
-    translate([30, 0])
-      circle(d = 5.1);
-
-    // bottom row #3, item #4
-    translate([30, 10])
-      circle(d = 5.1);
-
-    // bottom row #3, item #5
-    translate([30, 20])
-      circle(d = 5.1);
-
-    // top row #1, item #1
-    translate([120, 0])
-      circle(d = 5.1);
-
-    // top row #2, item #1
-    translate([110, -10])
-      circle(d = 5.1);
-
-    // top row #2, item #2
-    translate([110, 0])
-      circle(d = 5.1);
-
-    // top row #2, item #3
-    translate([110, 10])
-      circle(d = 5.1);
-
-    // top row #3, item #1
-    translate([100, -20])
-      circle(d = 5.1);
-
-    // top row #3, item #2
-    translate([100, -10])
-      circle(d = 5.1);
-
-    // bottom row #3, item #3
-    translate([100, 0])
-      circle(d = 5.1);
-
-    // bottom row #3, item #4
-    translate([100, 10])
-      circle(d = 5.1);
-
-    // bottom row #3, item #5
-    translate([100, 20])
-      circle(d = 5.1);
-  }
-}
-
 module length_axis_rail() {
   translate([
     0,
@@ -390,7 +271,6 @@ module length_axis_rail() {
         sliding_t_nut(length_axis_rail_t_nut);
     }
 }
-
 
 //! This assembly is for the axis that will travel along the length of the grid beam.
 module length_axis_assembly()
