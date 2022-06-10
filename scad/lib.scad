@@ -1,6 +1,3 @@
-include <./joining-plates.scad>;
-include <./l-brackets.scad>;
-include <./rack-and-pinion.scad>;
 
 // ball bearings
 BB688ZZ =  ["688ZZ", 8,  16,  5,   "silver",    1.5, 1.5];
@@ -27,6 +24,11 @@ AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1   
 //                                                  side, length, radius, radius, radius, depth, shaft, length,      holes, heights,    dia,   caps,  conn,  length2, bore
 NEMA23_HG86001Y21B     = ["NEMA23_HG86001Y21B",     56.4, 86,     75.7/2, 35,   38.1/2, 1.6,   6.35,    21,        47.1,    [8,     8], 3,     false, false, 0,       0];
 
+
+include <./joining-plates.scad>;
+include <./l-brackets.scad>;
+include <./rack-and-pinion.scad>;
+include <./spacers.scad>;
 
 function ceil_to(value, multiple) = ceil(value / multiple) * multiple;
 

@@ -2,10 +2,10 @@
 module external_gear_rack() {
   vitamin(str("Gear rack(External, Module 1.0, 500mm) : External Gear Rack" ));
 
-  mod = 1;
-  height = 10;
-  width = 20;
-  length = 499.51;
+  mod = external_gear_rack_module();
+  height = external_gear_rack_height();
+  width = external_gear_rack_width();
+  length = external_gear_rack_length();
   hole_diameter = 5;
   hole_inset_diameter = 9;
   hole_inset_height = 2;
@@ -26,6 +26,11 @@ module external_gear_rack() {
   }
 }
 
+function external_gear_rack_module() = 1;
+function external_gear_rack_height() = 10;
+function external_gear_rack_width() = 20;
+function external_gear_rack_length() = 500;
+
 module external_gear_rack_hole_positions(length) {
     for (i = [0: 2]) {
       translate([10 + i * 100, 10])
@@ -38,12 +43,15 @@ module external_gear_rack_hole_positions(length) {
     }
 }
 
+gear_rack_motor_mount_plate_sheet_type = AL10;
+
 //! Via MakerStore: https://www.makerstore.com.au/product/plate-motor-rack/
 module gear_rack_motor_mount_plate() {
   vitamin(str("Gear Rack Motor Mount Plate" ));
 
   NEMA_type = length_axis_motor_NEMA_type;
 
+  render_2D_sheet(gear_rack_motor_mount_plate_sheet_type)
   translate([-65, 0])
   difference() {
     hull() {
@@ -167,6 +175,18 @@ function pinion_gear_screw_height(type) = type[9];
 function pinion_gear_bore_diameter(type) = type[10];
 
 function pinion_gear_height(type) = pinion_gear_tooth_height(type) + pinion_gear_collar_height(type);
+
+function pinion_gear_outer_diameter(type) = involute_gear_od(
+  m = pinion_gear_module(type),
+  z = pinion_gear_teeth(type),
+  pa = pinion_gear_pitch_angle(type)
+);
+function pinion_gear_rack_distance(type) = centre_distance(
+  m = pinion_gear_module(type),
+  z1 = pinion_gear_teeth(type),
+  z2 = 0,
+  pa = pinion_gear_pitch_angle(type)
+);
 
 pinion_gear_16_teeth = [
   "16 Tooth",

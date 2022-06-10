@@ -12,6 +12,7 @@ function l_bracket_heightwise_hole_positions_list(type) = type[7];
 function l_bracket_offset(type) = type[8];
 function l_bracket_screw_type(type) = type[9];
 function l_bracket_tnut(type) = type[10];
+function l_bracket_nut_type(type) = type[11];
 
 function l_bracket_hole_radius(type) = screw_clearance_radius(l_bracket_screw_type(type));
 
@@ -27,6 +28,7 @@ lb_single = [
   [0, 2.75],
   M5_cap_screw,
   M5_sliding_t_nut,
+  M5_nut,
 ];
 
 lb_double = [
@@ -41,6 +43,7 @@ lb_double = [
   [0, 1],
   M5_cap_screw,
   M5_sliding_t_nut,
+  M5_nut,
 ];
 
 lb_triple = [
@@ -56,6 +59,7 @@ lb_triple = [
   [0, 0.2],
   M5_cap_screw,
   M5_sliding_t_nut,
+  M5_nut,
 ];
 
 module l_bracket(type) {

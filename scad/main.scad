@@ -61,14 +61,15 @@ length_axis_plate_offset = [
     (1/2) * length_axis_plate_size[1] - length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus
   ];
 length_axis_motor_NEMA_type = NEMA23_HG86001Y21B;
-length_axis_motor_mount_offset_y = -length_axis_plate_carriage_overhang - 2;
-length_axis_gear_module = 1;
-length_axis_gear_pressure_angle = 20;
-length_axis_gear_pinion_teeth = 14;
-length_axis_gear_rack_length = 500;
+length_axis_pinion_gear = pinion_gear_40_teeth;
+length_axis_motor_mount_offset = [
+  0,
+  -pinion_gear_collar_height(length_axis_pinion_gear) - 1,
+  -pinion_gear_rack_distance(length_axis_pinion_gear)
+];
+length_axis_motor_mount_rotation = 19.3;
+length_axis_pinion_gear_rotation = 6;
 length_axis_offset = [0, 0, 0];
-
-gear_rack_motor_mount_plate_sheet_type = AL10;
 
 width_axis_plate_sheet_type = AL6;
 width_axis_plate_offset_y = 20;
@@ -301,20 +302,109 @@ assembly("length_axis") {
   render_2D_sheet(length_axis_plate_sheet_type)
     length_axis_plate_dxf();
 
-  // motor
+  // gear rack
+  translate([
+    -(1/2) * length_axis_length,
+    -external_gear_rack_height(),
+    external_gear_rack_width(),
+  ])
+  for (gear_rack_index = [0 : floor(length_axis_length / external_gear_rack_length()) - 1]) {
+    translate([gear_rack_index * external_gear_rack_length(), 0, 0])
+    rotate([-90, 0, 0])
+    external_gear_rack();
+  }
+
+  // motor (with pinion gear and motor mount)
   translate([
     0,
-    -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + length_axis_motor_mount_offset_y,
-    (1/2) * extrusion_width(length_axis_extrusion_type) - 5
+    -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + length_axis_motor_mount_offset[1],
+    length_axis_motor_mount_offset[2]
   ])
-  rotate([90, 10, 0])
+  rotate([90, length_axis_motor_mount_rotation, 0])
   union() {
-    render_2D_sheet(gear_rack_motor_mount_plate_sheet_type)
-      gear_rack_motor_mount_plate_dxf();
+    gear_rack_motor_mount_plate();
+
+    // l-bracket #1
+    translate([-60, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+    translate([15, 0, 0])
+    union() {
+      rotate([0, 0, length_axis_motor_mount_rotation + 270])
+      translate([-15, -10, 0])
+      union() {
+        // bracket
+        l_bracket(lb_single);
+
+        translate([l_bracket_thickness(lb_single), 10, 10])
+        rotate([0, 90, 0])
+        union() {
+          // screw to connect motor mount l-bracket #1 to width-axis plate
+          screw(l_bracket_screw_type(lb_single), 60);
+
+          // nut
+          translate([0, 0, -(l_bracket_thickness(lb_single) + 40 + sheet_thickness(length_axis_plate_sheet_type))])
+          rotate([0, 180, 0])
+          nut(l_bracket_nut_type(lb_single), nyloc = true);
+        }
+
+        // spacers
+        translate([0, 10, 10])
+        rotate([0, -90, 0])
+        union() {
+          spacer(spacer_M5_20);
+
+          translate([0, 0, 20])
+          spacer(spacer_M5_20);
+        }
+      }
+
+      // screw to connect l-bracket #1 to motor mount
+      screw(
+        l_bracket_screw_type(lb_single),
+        screw_shorter_than(sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + nut_thickness(l_bracket_nut_type(lb_single), nyloc = true))
+      );
+      
+      // nut
+      rotate([180, 0, 0])
+      translate([0, 0, sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
+      nut(l_bracket_nut_type(lb_single), nyloc = true);
+    }
+
+    // l-bracket #2
+    translate([30, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+    translate([15, 0, 0])
+    union() {
+      rotate([0, 0, length_axis_motor_mount_rotation - 90])
+      translate([-15, -10, 0])
+      union() {
+        l_bracket(lb_single);
+
+        // screw to connect motor mount l-bracket #2 to width-axis plate
+        // TODO sping offset
+        translate([l_bracket_thickness(lb_single), 10, 10])
+        rotate([0, 90, 0])
+        screw(l_bracket_screw_type(lb_single), 100);
+
+        // TODO sping
+      }
+
+      screw(
+        l_bracket_screw_type(lb_single),
+        screw_shorter_than(sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + nut_thickness(l_bracket_nut_type(lb_single), nyloc = true))
+      );
+      
+      rotate([180, 0, 0])
+      translate([0, 0, sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
+      nut(l_bracket_nut_type(lb_single), nyloc = true);
+    }
 
     rotate([180, 0, 0])
     translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
-      NEMA(length_axis_motor_NEMA_type);
+    NEMA(length_axis_motor_NEMA_type);
+
+    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - pinion_gear_collar_height(length_axis_pinion_gear)])
+    rotate([0, 0, length_axis_pinion_gear_rotation])
+    // rotate([0, 0, pinion_gear_rack_rotation(length_axis_pinion_gear)])
+    pinion_gear(length_axis_pinion_gear);
   }
 }
 
@@ -725,4 +815,5 @@ assembly("main") {
 
 if($preview) {
   main_assembly();
+  // length_axis_assembly();
 }
