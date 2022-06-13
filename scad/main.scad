@@ -314,6 +314,29 @@ assembly("length_axis") {
     external_gear_rack();
   }
 
+  // motor mount extrusion : a
+  length_axis_motor_mount_a_extrusion_type = E2040;
+  length_axis_motor_mount_a_extrusion_length = 40;
+  translate([
+    -50,
+    -extrusion_width(length_axis_motor_mount_a_extrusion_type) + length_axis_motor_mount_offset[1],
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) - (1/2) * extrusion_height(length_axis_motor_mount_a_extrusion_type)
+  ])
+  rotate([90, 0, 90])
+  extrusion(length_axis_motor_mount_a_extrusion_type, length_axis_motor_mount_a_extrusion_length);
+
+  // motor mount extrusion : b
+  length_axis_motor_mount_b_extrusion_type = E2080;
+  length_axis_motor_mount_b_extrusion_length = 40;
+  translate([
+    50,
+    -extrusion_width(length_axis_motor_mount_b_extrusion_type) + length_axis_motor_mount_offset[1],
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) - (1/2) * extrusion_height(length_axis_motor_mount_b_extrusion_type)
+  ])
+  rotate([90, 0, 90])
+  extrusion(length_axis_motor_mount_b_extrusion_type, length_axis_motor_mount_b_extrusion_length);
+
+
   // motor (with pinion gear and motor mount)
   translate([
     0,
