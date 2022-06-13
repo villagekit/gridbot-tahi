@@ -43,22 +43,22 @@ length_axis_rail_carriage_type = HGH20CA_carriage;
 length_axis_rail_carriage_spacing = 5;
 length_axis_rail_carriage_pos = 0;
 length_axis_rail_t_nut = M5_sliding_t_nut;
-length_axis_plate_sheet_type = AL6;
-length_axis_plate_carriage_overhang = (1/2) * (carriage_width(length_axis_rail_carriage_type) - 20);
-length_axis_plate_join_screw = M5_cap_screw;
-length_axis_plate_join_margin = screw_head_radius(length_axis_plate_join_screw) * 1.2;
-length_axis_plate_overhang_x_plus = 2 * length_axis_plate_join_margin;
-length_axis_plate_overhang_x_minus = 30;
-length_axis_plate_size = [
+length_axis_bottom_plate_sheet_type = AL6;
+length_axis_bottom_plate_carriage_overhang = (1/2) * (carriage_width(length_axis_rail_carriage_type) - 20);
+length_axis_bottom_plate_join_screw = M5_cap_screw;
+length_axis_bottom_plate_join_margin = screw_head_radius(length_axis_bottom_plate_join_screw) * 1.2;
+length_axis_bottom_plate_overhang_x_plus = 2 * length_axis_bottom_plate_join_margin;
+length_axis_bottom_plate_overhang_x_minus = 30;
+length_axis_bottom_plate_size = [
     max(
       length_axis_rail_carriage_spacing + 2 * carriage_length(length_axis_rail_carriage_type),
-      100 + 4 * length_axis_plate_join_margin
+      100 + 4 * length_axis_bottom_plate_join_margin
     ),
-    80 + 2 * length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus + length_axis_plate_overhang_x_minus
+    80 + 2 * length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus + length_axis_bottom_plate_overhang_x_minus
   ];
-length_axis_plate_offset = [
+length_axis_bottom_plate_offset = [
     0,
-    (1/2) * length_axis_plate_size[1] - length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus
+    (1/2) * length_axis_bottom_plate_size[1] - length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus
   ];
 length_axis_motor_NEMA_type = NEMA23_HG86001Y21B;
 length_axis_pinion_gear = pinion_gear_40_teeth;
@@ -67,8 +67,14 @@ length_axis_motor_mount_offset = [
   -pinion_gear_collar_height(length_axis_pinion_gear) - 1,
   -pinion_gear_rack_distance(length_axis_pinion_gear)
 ];
-length_axis_motor_mount_rotation = 19.3;
+length_axis_motor_mount_rotation = 30;
+length_axis_motor_mount_side_plate_rotation = 10;
 length_axis_pinion_gear_rotation = 6;
+length_axis_side_plate_sheet_type = AL6;
+length_axis_side_plate_size = [
+  160,
+  60,
+];
 length_axis_offset = [0, 0, 0];
 
 width_axis_plate_sheet_type = AL6;
@@ -76,7 +82,7 @@ width_axis_plate_offset_y = 20;
 width_axis_offset = [
   length_axis_offset[0],
   length_axis_offset[1] + 0,
-  length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_plate_sheet_type)
+  length_axis_offset[2] + extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + sheet_thickness(length_axis_bottom_plate_sheet_type)
 ];
 
 hanpose_hpv6_travel_distance = 100;
@@ -121,12 +127,12 @@ echo("workholding_size", workholding_size);
 workholding_bed_extrusion_type = E2020;
 
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
-module length_axis_plate_dxf() {
-  dxf("length_axis_plate");
+module length_axis_bottom_plate_dxf() {
+  dxf("length_axis_bottom_plate");
 
   difference() {
-    translate(length_axis_plate_offset)
-      sheet_2D(length_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
+    translate(length_axis_bottom_plate_offset)
+      sheet_2D(length_axis_bottom_plate_sheet_type, length_axis_bottom_plate_size[0], length_axis_bottom_plate_size[1], 2);
 
     // length-axis rail #1, carriage #1
     translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
@@ -150,36 +156,36 @@ module length_axis_plate_dxf() {
 
     // width-axis extrusion join #1
     translate([40, 40])
-      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+      circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #2
     translate([-40, 40])
-      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+      circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #3
-    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+    translate([0, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #4
-    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(d = screw_boss_diameter(length_axis_plate_join_screw));
+    translate([0, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
 
 
     // inter-plate join #1
-    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([(1/2) * length_axis_bottom_plate_size[0] - length_axis_bottom_plate_join_margin, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #2
-    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([-(1/2) * length_axis_bottom_plate_size[0] + length_axis_bottom_plate_join_margin, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #3
-    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([(1/2) * length_axis_bottom_plate_size[0] - length_axis_bottom_plate_join_margin, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #4
-    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([-(1/2) * length_axis_bottom_plate_size[0] + length_axis_bottom_plate_join_margin, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
   }
 }
 
@@ -188,8 +194,8 @@ module width_axis_plate_dxf() {
   dxf("width_axis_plate");
 
   difference() {
-    translate(length_axis_plate_offset)
-      sheet_2D(width_axis_plate_sheet_type, length_axis_plate_size[0], length_axis_plate_size[1], 2);
+    translate(length_axis_bottom_plate_offset)
+      sheet_2D(width_axis_plate_sheet_type, length_axis_bottom_plate_size[0], length_axis_bottom_plate_size[1], 2);
 
     // length-axis rail #1, carriage #1
     translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
@@ -213,35 +219,35 @@ module width_axis_plate_dxf() {
 
     // width-axis extrusion join #1
     translate([40, 40])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #2
     translate([-40, 40])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #3
-    translate([0, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([0, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // width-axis extrusion join #4
-    translate([0, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([0, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #1
-    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([(1/2) * length_axis_bottom_plate_size[0] - length_axis_bottom_plate_join_margin, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #2
-    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, 80 + length_axis_plate_carriage_overhang + length_axis_plate_overhang_x_plus - length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([-(1/2) * length_axis_bottom_plate_size[0] + length_axis_bottom_plate_join_margin, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #3
-    translate([(1/2) * length_axis_plate_size[0] - length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([(1/2) * length_axis_bottom_plate_size[0] - length_axis_bottom_plate_join_margin, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
 
     // inter-plate join #4
-    translate([-(1/2) * length_axis_plate_size[0] + length_axis_plate_join_margin, -length_axis_plate_carriage_overhang - length_axis_plate_overhang_x_minus + length_axis_plate_join_margin])
-      circle(r = screw_clearance_radius(length_axis_plate_join_screw));
+    translate([-(1/2) * length_axis_bottom_plate_size[0] + length_axis_bottom_plate_join_margin, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
+      circle(r = screw_clearance_radius(length_axis_bottom_plate_join_screw));
   }
 }
 
@@ -273,6 +279,27 @@ module length_axis_rail() {
     }
 }
 
+module length_axis_side_plate_dxf() {
+  dxf("length_axis_side_plate");
+
+  // [0, 0] is top of plate
+
+  difference() {
+    translate([0, -(1/2) * length_axis_side_plate_size[1]])
+    sheet_2D(length_axis_side_plate_sheet_type, length_axis_side_plate_size[0], length_axis_side_plate_size[1], 2);
+
+    translate([
+      0,
+      -extrusion_width(length_axis_extrusion_type) - carriage_height(length_axis_rail_carriage_type),
+    ])
+    translate([
+      0,
+      length_axis_motor_mount_offset[2],
+    ])
+      circle(r = (3/4) * NEMA_width(length_axis_motor_NEMA_type));
+  }
+}
+
 //! This assembly is for the axis that will travel along the length of the grid beam.
 module length_axis_assembly()
 assembly("length_axis") {
@@ -293,14 +320,14 @@ assembly("length_axis") {
   translate([0, 70, 0])
     length_axis_rail();
 
-  // plate
+  // bottom plate
   translate([
     0,
     0,
-    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_plate_sheet_type)
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) + (1/2) * sheet_thickness(length_axis_bottom_plate_sheet_type)
   ])
-  render_2D_sheet(length_axis_plate_sheet_type)
-    length_axis_plate_dxf();
+  render_2D_sheet(length_axis_bottom_plate_sheet_type)
+    length_axis_bottom_plate_dxf();
 
   // gear rack
   translate([
@@ -314,28 +341,15 @@ assembly("length_axis") {
     external_gear_rack();
   }
 
-  // motor mount extrusion : a
-  length_axis_motor_mount_a_extrusion_type = E2040;
-  length_axis_motor_mount_a_extrusion_length = 40;
+  // side plate
   translate([
-    -50,
-    -extrusion_width(length_axis_motor_mount_a_extrusion_type) + length_axis_motor_mount_offset[1],
-    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) - (1/2) * extrusion_height(length_axis_motor_mount_a_extrusion_type)
+    0,
+    length_axis_motor_mount_offset[1] - sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - (1/2) * sheet_thickness(length_axis_side_plate_sheet_type),
+    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type),
   ])
-  rotate([90, 0, 90])
-  extrusion(length_axis_motor_mount_a_extrusion_type, length_axis_motor_mount_a_extrusion_length);
-
-  // motor mount extrusion : b
-  length_axis_motor_mount_b_extrusion_type = E2080;
-  length_axis_motor_mount_b_extrusion_length = 40;
-  translate([
-    50,
-    -extrusion_width(length_axis_motor_mount_b_extrusion_type) + length_axis_motor_mount_offset[1],
-    extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type) - (1/2) * extrusion_height(length_axis_motor_mount_b_extrusion_type)
-  ])
-  rotate([90, 0, 90])
-  extrusion(length_axis_motor_mount_b_extrusion_type, length_axis_motor_mount_b_extrusion_length);
-
+  rotate([90, 0, 0])
+  render_2D_sheet(length_axis_side_plate_sheet_type)
+  length_axis_side_plate_dxf();
 
   // motor (with pinion gear and motor mount)
   translate([
@@ -347,56 +361,28 @@ assembly("length_axis") {
   union() {
     gear_rack_motor_mount_plate();
 
-    // l-bracket #1
-    translate([-60, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+    // connect side plate to motor mount: #1, fixed
+    translate([-75, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
     translate([15, 0, 0])
     union() {
-      rotate([0, 0, length_axis_motor_mount_rotation + 270])
-      translate([-15, -10, 0])
-      union() {
-        // bracket
-        l_bracket(lb_single);
-
-        translate([l_bracket_thickness(lb_single), 10, 10])
-        rotate([0, 90, 0])
-        union() {
-          // screw to connect motor mount l-bracket #1 to width-axis plate
-          screw(l_bracket_screw_type(lb_single), 60);
-
-          // nut
-          translate([0, 0, -(l_bracket_thickness(lb_single) + 40 + sheet_thickness(length_axis_plate_sheet_type))])
-          rotate([0, 180, 0])
-          nut(l_bracket_nut_type(lb_single), nyloc = true);
-        }
-
-        // spacers
-        translate([0, 10, 10])
-        rotate([0, -90, 0])
-        union() {
-          spacer(spacer_M5_20);
-
-          translate([0, 0, 20])
-          spacer(spacer_M5_20);
-        }
-      }
-
-      // screw to connect l-bracket #1 to motor mount
+      // screw
+      translate([0, 0, -sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
+      rotate([180, 0, 0])
       screw(
         l_bracket_screw_type(lb_single),
-        screw_shorter_than(sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + nut_thickness(l_bracket_nut_type(lb_single), nyloc = true))
+        screw_shorter_than(sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + sheet_thickness(length_axis_side_plate_sheet_type) + nut_thickness(l_bracket_nut_type(lb_single), nyloc = true))
       );
       
       // nut
-      rotate([180, 0, 0])
-      translate([0, 0, sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
+      translate([0, 0, sheet_thickness(length_axis_side_plate_sheet_type) ])
       nut(l_bracket_nut_type(lb_single), nyloc = true);
     }
 
-    // l-bracket #2
-    translate([30, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+    // connect side plate to motor mount: #2, dynamic
+    translate([40, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
     translate([15, 0, 0])
     union() {
-      rotate([0, 0, length_axis_motor_mount_rotation - 90])
+      rotate([0, 0, length_axis_motor_mount_rotation - 90 - length_axis_motor_mount_side_plate_rotation])
       translate([-15, -10, 0])
       union() {
         l_bracket(lb_single);
@@ -405,9 +391,9 @@ assembly("length_axis") {
         // TODO sping offset
         translate([l_bracket_thickness(lb_single), 10, 10])
         rotate([0, 90, 0])
-        screw(l_bracket_screw_type(lb_single), 100);
+        screw(l_bracket_screw_type(lb_single), 60);
 
-        // TODO sping
+        // TODO spring
       }
 
       screw(
@@ -435,7 +421,7 @@ assembly("length_axis") {
 module width_axis_assembly()
 assembly("width_axis") {
   // plate
-  translate([0, 0, (1/2) * sheet_thickness(length_axis_plate_sheet_type)])
+  translate([0, 0, (1/2) * sheet_thickness(length_axis_bottom_plate_sheet_type)])
     render_2D_sheet(width_axis_plate_sheet_type)
     width_axis_plate_dxf();
 
@@ -838,5 +824,8 @@ assembly("main") {
 
 if($preview) {
   main_assembly();
+
   // length_axis_assembly();
+
+  // render_2D_sheet(length_axis_side_plate_sheet_type) length_axis_side_plate_dxf();
 }
