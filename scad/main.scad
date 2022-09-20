@@ -912,8 +912,4 @@ assembly("main") {
 
 if($preview) {
   main_assembly();
-
-  // length_axis_assembly();
-
-  // render_2D_sheet(length_axis_side_plate_sheet_type) length_axis_side_plate_dxf();
 }

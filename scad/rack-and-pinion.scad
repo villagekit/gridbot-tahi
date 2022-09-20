@@ -1,6 +1,6 @@
 //! Via BulkMan3D: https://bulkman3d.com/product/module-1-0-gear-rack-external/
 module external_gear_rack() {
-  vitamin(str("Gear rack(External, Module 1.0, 500mm) : External Gear Rack" ));
+  vitamin(str("external_gear_rack(External, Module 1.0, 500mm): External Gear Rack" ));
 
   mod = external_gear_rack_module();
   height = external_gear_rack_height();
@@ -47,7 +47,7 @@ gear_rack_motor_mount_plate_sheet_type = AL10;
 
 //! Via MakerStore: https://www.makerstore.com.au/product/plate-motor-rack/
 module gear_rack_motor_mount_plate() {
-  vitamin(str("Gear Rack Motor Mount Plate" ));
+  vitamin(str("gear_rack_motor_mount_plate: Gear Rack Motor Mount Plate"));
 
   NEMA_type = length_axis_motor_NEMA_type;
 
