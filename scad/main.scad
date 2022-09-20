@@ -48,7 +48,7 @@ length_axis_bottom_plate_carriage_overhang = (1/2) * (carriage_width(length_axis
 length_axis_bottom_plate_join_screw = M5_cap_screw;
 length_axis_bottom_plate_join_margin = screw_head_radius(length_axis_bottom_plate_join_screw) * 1.2;
 length_axis_bottom_plate_overhang_x_plus = 2 * length_axis_bottom_plate_join_margin;
-length_axis_bottom_plate_overhang_x_minus = 30;
+length_axis_bottom_plate_overhang_x_minus = 55;
 length_axis_bottom_plate_size = [
     max(
       length_axis_rail_carriage_spacing + 2 * carriage_length(length_axis_rail_carriage_type),
@@ -56,6 +56,7 @@ length_axis_bottom_plate_size = [
     ),
     80 + 2 * length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus + length_axis_bottom_plate_overhang_x_minus
   ];
+echo(length_axis_bottom_plate_size);
 length_axis_bottom_plate_offset = [
     0,
     (1/2) * length_axis_bottom_plate_size[1] - length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus
@@ -68,14 +69,12 @@ length_axis_motor_mount_offset = [
   -pinion_gear_rack_distance(length_axis_pinion_gear)
 ];
 length_axis_motor_mount_rotation = 30;
-length_axis_motor_mount_side_plate_rotation = 10;
+length_axis_motor_mount_side_plate_rotation = 0;
 length_axis_pinion_gear_rotation = 6;
-length_axis_side_plate_sheet_type = AL6;
-length_axis_side_plate_size = [
-  160,
-  60,
-];
+length_axis_side_plate_sheet_type = AL5;
 length_axis_offset = [0, 0, 0];
+length_axis_gear_rack_motor_pivot_position = -55;
+length_axis_gear_rack_motor_anchor_position = 55;
 
 width_axis_plate_sheet_type = AL6;
 width_axis_plate_offset_y = 20;
@@ -154,6 +153,16 @@ module length_axis_bottom_plate_dxf() {
     carriage_hole_positions(length_axis_rail_carriage_type)
       circle(r = screw_clearance_radius(carriage_screw(length_axis_rail_carriage_type)));
 
+    // side plate joins
+    translate([
+      -40,
+      length_axis_motor_mount_offset[1] - sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - sheet_thickness(length_axis_side_plate_sheet_type) - 15,
+    ])
+    for (hole_index = [0 : 4]) {
+      translate([hole_index * 20, 0])
+      circle(r = screw_clearance_radius(M5_cap_screw));
+    }
+
     // width-axis extrusion join #1
     translate([40, 40])
       circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
@@ -169,7 +178,6 @@ module length_axis_bottom_plate_dxf() {
     // width-axis extrusion join #4
     translate([0, -length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus + length_axis_bottom_plate_join_margin])
       circle(d = screw_boss_diameter(length_axis_bottom_plate_join_screw));
-
 
     // inter-plate join #1
     translate([(1/2) * length_axis_bottom_plate_size[0] - length_axis_bottom_plate_join_margin, 80 + length_axis_bottom_plate_carriage_overhang + length_axis_bottom_plate_overhang_x_plus - length_axis_bottom_plate_join_margin])
@@ -216,6 +224,16 @@ module width_axis_plate_dxf() {
     translate([-(1/2) * length_axis_rail_carriage_spacing - (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 70])
     carriage_hole_positions(length_axis_rail_carriage_type)
       circle(d = screw_boss_diameter(carriage_screw(length_axis_rail_carriage_type)));
+
+    // side plate joins
+    translate([
+      -40,
+      length_axis_motor_mount_offset[1] - sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - sheet_thickness(length_axis_side_plate_sheet_type) - 15,
+    ])
+    for (hole_index = [0 : 4]) {
+      translate([hole_index * 20, 0])
+      circle(d = screw_boss_diameter(M5_cap_screw));
+    }
 
     // width-axis extrusion join #1
     translate([40, 40])
@@ -279,24 +297,72 @@ module length_axis_rail() {
     }
 }
 
+module length_axis_side_plate_motor_position() {
+  translate([
+    0,
+    length_axis_motor_mount_offset[2] - extrusion_width(length_axis_extrusion_type) - carriage_height(length_axis_rail_carriage_type),
+  ])
+  children();
+}
+
+module length_axis_side_plate_pivot_position() {
+  length_axis_side_plate_motor_position()
+  translate([
+    cos(-length_axis_motor_mount_rotation) * length_axis_gear_rack_motor_pivot_position,
+    sin(-length_axis_motor_mount_rotation) * length_axis_gear_rack_motor_pivot_position,
+  ])
+  children();
+}
+
+module length_axis_side_plate_anchor_fixed_position() {
+  length_axis_side_plate_motor_position()
+  translate([
+    cos(length_axis_motor_mount_rotation) * length_axis_gear_rack_motor_anchor_position,
+    sin(length_axis_motor_mount_rotation) * length_axis_gear_rack_motor_anchor_position,
+  ])
+  children();
+}
+
 module length_axis_side_plate_dxf() {
   dxf("length_axis_side_plate");
 
   // [0, 0] is top of plate
 
   difference() {
-    translate([0, -(1/2) * length_axis_side_plate_size[1]])
-    sheet_2D(length_axis_side_plate_sheet_type, length_axis_side_plate_size[0], length_axis_side_plate_size[1], 2);
+    union() {
+      hull() {
+        translate([-20, -5])
+        sheet_2D(length_axis_side_plate_sheet_type, 60, 10, 5);
 
-    translate([
-      0,
-      -extrusion_width(length_axis_extrusion_type) - carriage_height(length_axis_rail_carriage_type),
-    ])
-    translate([
-      0,
-      length_axis_motor_mount_offset[2],
-    ])
-      circle(r = (3/4) * NEMA_width(length_axis_motor_NEMA_type));
+        length_axis_side_plate_pivot_position()
+        circle(d = 20);
+      }
+
+      hull() {
+        translate([20, -5])
+        sheet_2D(length_axis_side_plate_sheet_type, 60, 10, 5);
+
+        length_axis_side_plate_anchor_fixed_position()
+        circle(d = 20);
+      }
+
+      translate([0, -10])
+      sheet_2D(length_axis_side_plate_sheet_type, 60, 20, 5);
+    }
+
+    length_axis_side_plate_pivot_position()
+    circle(r = screw_clearance_radius(M5_cap_screw));
+
+    length_axis_side_plate_anchor_fixed_position()
+    circle(r = screw_clearance_radius(M5_cap_screw));
+
+    translate([-50 + 10, -10])
+    union() {
+      for (hole_index = [0 : 4]) {
+        translate([hole_index * 20, 0])
+        circle(r = screw_clearance_radius(M5_cap_screw));
+      }
+    }
   }
 }
 
@@ -348,10 +414,30 @@ assembly("length_axis") {
     extrusion_width(length_axis_extrusion_type) + carriage_height(length_axis_rail_carriage_type),
   ])
   rotate([90, 0, 0])
-  render_2D_sheet(length_axis_side_plate_sheet_type)
-  length_axis_side_plate_dxf();
+  union() {
+    render_2D_sheet(length_axis_side_plate_sheet_type)
+    length_axis_side_plate_dxf();
 
-  // motor (with pinion gear and motor mount)
+    // connect side plate to motor mount: #3, anchor dynamic
+    length_axis_side_plate_anchor_fixed_position()
+    union() {
+      rotate([0, 0, 90])
+      translate([-15, -10, (1/2) * sheet_thickness(length_axis_side_plate_sheet_type)])
+      l_bracket(lb_single);
+
+      translate([0, 0, l_bracket_thickness(lb_single)])
+      screw(
+        l_bracket_screw_type(lb_single),
+        screw_shorter_than(sheet_thickness(length_axis_side_plate_sheet_type) + nut_thickness(l_bracket_nut_type(lb_single), nyloc = true))
+      );
+
+      rotate([180, 0, 0])
+      translate([0, 0, (1/2) * sheet_thickness(length_axis_side_plate_sheet_type)])
+      nut(l_bracket_nut_type(lb_single), nyloc = true);
+    }
+  }
+
+  // gear rack motor
   translate([
     0,
     -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) + length_axis_motor_mount_offset[1],
@@ -361,9 +447,17 @@ assembly("length_axis") {
   union() {
     gear_rack_motor_mount_plate();
 
-    // connect side plate to motor mount: #1, fixed
-    translate([-75, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
-    translate([15, 0, 0])
+    rotate([180, 0, 0])
+    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
+    NEMA(length_axis_motor_NEMA_type);
+
+    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - pinion_gear_collar_height(length_axis_pinion_gear)])
+    rotate([0, 0, length_axis_pinion_gear_rotation])
+    // rotate([0, 0, pinion_gear_rack_rotation(length_axis_pinion_gear)])
+    pinion_gear(length_axis_pinion_gear);
+
+    // connect side plate to motor mount: #1, pivot
+    translate([length_axis_gear_rack_motor_pivot_position, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
     union() {
       // screw
       translate([0, 0, -sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
@@ -378,22 +472,25 @@ assembly("length_axis") {
       nut(l_bracket_nut_type(lb_single), nyloc = true);
     }
 
-    // connect side plate to motor mount: #2, dynamic
-    translate([40, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
-    translate([15, 0, 0])
+    // connect side plate to motor mount: #2, anchor dynamic
+    translate([length_axis_gear_rack_motor_anchor_position, 0, (1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
     union() {
       rotate([0, 0, length_axis_motor_mount_rotation - 90 - length_axis_motor_mount_side_plate_rotation])
       translate([-15, -10, 0])
       union() {
+        rotate([0, -90, 180])
+        translate([0, -20, 5])
         l_bracket(lb_single);
 
         // screw to connect motor mount l-bracket #2 to width-axis plate
-        // TODO sping offset
-        translate([l_bracket_thickness(lb_single), 10, 10])
+        translate([l_bracket_thickness(lb_single) + 5, 10, 15])
+        translate([15, 0, 0]) // sping offset
         rotate([0, 90, 0])
         screw(l_bracket_screw_type(lb_single), 60);
 
-        // TODO spring
+        translate([l_bracket_thickness(lb_single) + 5, 10, 15])
+        rotate([0, 90, 0])
+        comp_spring(spring_1d2_7d5_20, 15);
       }
 
       screw(
@@ -404,16 +501,7 @@ assembly("length_axis") {
       rotate([180, 0, 0])
       translate([0, 0, sheet_thickness(gear_rack_motor_mount_plate_sheet_type) ])
       nut(l_bracket_nut_type(lb_single), nyloc = true);
-    }
-
-    rotate([180, 0, 0])
-    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type)])
-    NEMA(length_axis_motor_NEMA_type);
-
-    translate([0, 0, -(1/2) * sheet_thickness(gear_rack_motor_mount_plate_sheet_type) - pinion_gear_collar_height(length_axis_pinion_gear)])
-    rotate([0, 0, length_axis_pinion_gear_rotation])
-    // rotate([0, 0, pinion_gear_rack_rotation(length_axis_pinion_gear)])
-    pinion_gear(length_axis_pinion_gear);
+    };
   }
 }
 
