@@ -1,5 +1,3 @@
-include <./joining-plates.scad>;
-include <./l-brackets.scad>;
 
 // ball bearings
 BB688ZZ =  ["688ZZ", 8,  16,  5,   "silver",    1.5, 1.5];
@@ -19,6 +17,7 @@ E20C = ["E20C", 40, 80, -4.2, -3, 8, 6, 12.0, 2, 2, 1, false ];
 
 // sheets
 AL4        = [ "AL4",        "Aluminium tooling plate", 4, [0.9, 0.9, 0.9, 1    ], false];
+AL5        = [ "AL5",        "Aluminium tooling plate", 5, [0.9, 0.9, 0.9, 1    ], false];
 AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1    ], false];
 
 // stepper motors
@@ -26,6 +25,15 @@ AL10       = [ "AL10",       "Aluminium tooling plate", 10, [0.9, 0.9, 0.9, 1   
 //                                                  side, length, radius, radius, radius, depth, shaft, length,      holes, heights,    dia,   caps,  conn,  length2, bore
 NEMA23_HG86001Y21B     = ["NEMA23_HG86001Y21B",     56.4, 86,     75.7/2, 35,   38.1/2, 1.6,   6.35,    21,        47.1,    [8,     8], 3,     false, false, 0,       0];
 
+// springs
+spring_1_9_20  = ["spring_1_9_20", 9, 1, 20, 5, 0, false, 0,   "silver"];
+spring_1_9_22  = ["spring_1_9_22", 9, 1, 22, 6, 0, false, 0,   "silver"];
+spring_1d2_7d5_20  = ["spring_1d2_7d5_20", 7.5, 1.2, 20, 8, 0, false, 0,   "silver"];
+
+include <./joining-plates.scad>;
+include <./l-brackets.scad>;
+include <./rack-and-pinion.scad>;
+include <./spacers.scad>;
 
 function ceil_to(value, multiple) = ceil(value / multiple) * multiple;
 
