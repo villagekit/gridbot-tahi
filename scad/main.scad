@@ -38,8 +38,8 @@ include <./lib.scad>
 
 length_axis_extrusion_type = E2080;
 length_axis_length = 1500;
-length_axis_rail_type = HGH20CA;
-length_axis_rail_carriage_type = HGH20CA_carriage;
+length_axis_rail_type = HGH15CA;
+length_axis_rail_carriage_type = HGH15CA_carriage;
 length_axis_rail_carriage_spacing = 5;
 length_axis_rail_carriage_pos = 0;
 length_axis_rail_t_nut = M5_sliding_t_nut;
