@@ -119,11 +119,11 @@ workholding_leg_height = 120;
 workholding_extrusion_type = E2040;
 workholding_size = [
   length_axis_length,
-  200,
+  240,
   ceil_to(workholding_leg_height + workholding_bed_height + 40, 40)
 ];
 echo("workholding_size", workholding_size);
-workholding_bed_extrusion_type = E2020;
+workholding_bed_extrusion_type = E2040;
 
 //! A plate to connect the length-axis components, which connects to the width-axis mount plate.
 module length_axis_bottom_plate_dxf() {
@@ -843,8 +843,9 @@ assembly("workholding") {
       workholding_size[1] - (3/2) * extrusion_width(workholding_extrusion_type),
       workholding_bed_height
     ])
-      rotate([0, 90, 0])
-      extrusion(workholding_bed_extrusion_type, workholding_size[0]);
+    rotate([0, 90, 0])
+    translate([0, -(1/2) * extrusion_width(workholding_bed_extrusion_type)])
+    extrusion(workholding_bed_extrusion_type, workholding_size[0]);
   }
 }
 
