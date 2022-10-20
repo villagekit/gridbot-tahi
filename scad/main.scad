@@ -72,7 +72,7 @@ length_axis_motor_mount_rotation = 30;
 length_axis_motor_mount_side_plate_rotation = 0;
 length_axis_pinion_gear_rotation = 6;
 length_axis_side_plate_sheet_type = AL5;
-length_axis_offset = [0, 0, 0];
+length_axis_offset = [0, -20, 0];
 length_axis_gear_rack_motor_pivot_position = -55;
 length_axis_gear_rack_motor_anchor_position = 55;
 
