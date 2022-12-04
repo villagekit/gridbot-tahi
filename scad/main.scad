@@ -58,9 +58,17 @@ length_axis_bottom_plate_size = [
   ];
 echo(length_axis_bottom_plate_size);
 length_axis_bottom_plate_offset = [
-    0,
-    (1/2) * length_axis_bottom_plate_size[1] - length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus
-  ];
+  0,
+  (1/2) * length_axis_bottom_plate_size[1] - length_axis_bottom_plate_carriage_overhang - length_axis_bottom_plate_overhang_x_minus
+];
+length_axis_dragchain_adapter_size = [
+  30,
+  30,
+];
+length_axis_dragchain_adapter_offset = [
+  -(1/2) * length_axis_bottom_plate_size[0],
+  -external_gear_rack_height() - 5,
+];
 length_axis_motor_NEMA_type = NEMA23_HG86001Y21B;
 length_axis_pinion_gear = pinion_gear_40_teeth;
 length_axis_motor_mount_offset = [
@@ -131,8 +139,22 @@ module length_axis_bottom_plate_dxf() {
   dxf("length_axis_bottom_plate");
 
   difference() {
-    translate(length_axis_bottom_plate_offset)
+    union() {
+      translate(length_axis_bottom_plate_offset)
       sheet_2D(length_axis_bottom_plate_sheet_type, length_axis_bottom_plate_size[0], length_axis_bottom_plate_size[1], 2);
+
+      length_axis_dragchain_adapter_radius = 2;
+      translate([
+        length_axis_dragchain_adapter_offset[0] + -(1/2) * (length_axis_dragchain_adapter_size[0] - length_axis_dragchain_adapter_radius),
+        length_axis_dragchain_adapter_offset[1] + -(1/2) * length_axis_dragchain_adapter_size[1],
+      ])
+      sheet_2D(
+        length_axis_bottom_plate_sheet_type,
+        (length_axis_dragchain_adapter_size[0] + length_axis_dragchain_adapter_radius),
+        length_axis_dragchain_adapter_size[1],
+        length_axis_dragchain_adapter_radius
+      );
+    }
 
     // length-axis rail #1, carriage #1
     translate([(1/2) * length_axis_rail_carriage_spacing + (1/2) * carriage_length(length_axis_rail_carriage_type) + length_axis_rail_carriage_pos, 10])
