@@ -76,6 +76,14 @@ length_axis_offset = [0, -20, 0];
 length_axis_gear_rack_motor_pivot_position = -55;
 length_axis_gear_rack_motor_anchor_position = 55;
 length_side_cover_plate_sheet_type = AL6;
+length_axis_dragchain_adapter_size = [
+  55,
+  25,
+];
+length_axis_dragchain_adapter_holes = [
+  [30, 0],
+  [30+45, 0],
+];
 
 width_axis_plate_sheet_type = AL6;
 width_axis_plate_offset_y = 20;
@@ -337,6 +345,18 @@ module length_axis_motor_side_plate_dxf() {
 
         length_axis_motor_side_plate_pivot_position()
         circle(d = 20);
+
+        // drag chain adapter
+        translate([
+          -20 - (3/2) * length_axis_dragchain_adapter_size[0],
+          -(1/2) * length_axis_dragchain_adapter_size[1],
+        ])
+        sheet_2D(
+          length_axis_motor_side_plate_sheet_type,
+          length_axis_dragchain_adapter_size[0],
+          length_axis_dragchain_adapter_size[1],
+          5
+        );
       }
 
       hull() {
@@ -363,6 +383,13 @@ module length_axis_motor_side_plate_dxf() {
         translate([hole_index * 20, 0])
         circle(r = screw_clearance_radius(M5_cap_screw));
       }
+    }
+
+    // drag chain adapter holes
+    translate([-40, -10])
+    for (hole = length_axis_dragchain_adapter_holes) {
+      translate(-hole)
+      circle(r = screw_clearance_radius(M5_cap_screw));
     }
   }
 }
