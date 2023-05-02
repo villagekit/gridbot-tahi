@@ -1,5 +1,5 @@
 <a name="TOP"></a>
-# Gridbot-cad
+# Gridbot-tahi
 A simple open source machine for automated [grid beam](https://gridbeam.xyz) production.
 
 Where possible, uses easy-to-source OpenBuilds components (e.g. [MakerStore](https://www.makerstore.com.au/), [BulkMan 3D](https://bulkman3d.com/)) or other readily available standardized parts, following inspiration from open source "pro" consumer CNC machines.
@@ -72,6 +72,9 @@ One spindle, two axis of motion (beam-length and beam-width).
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 51.2mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 86mm |
 | &nbsp;&nbsp;157&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;131&nbsp; | &nbsp;&nbsp;54&nbsp; | &nbsp;&nbsp;358&nbsp; | &nbsp;&nbsp;Total vitamins count |
+|  |  |  |  |  |  | | **3D printed parts** |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;stm32_f7676zi_din_mount.stl |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
 |  |  |  |  |  |  | | **CNC routed parts** |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;length_axis_bottom_plate.dxf |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;length_axis_motor_side_plate.dxf |
@@ -278,6 +281,14 @@ This assembly is for the axis that will travel along the length of the grid beam
 |6| Double L Bracket|
 |24| Nut M5 sliding T|
 |24| Screw M5 cap x  8mm|
+
+
+### 3D Printed parts
+
+| 1 x stm32_f7676zi_din_mount.stl |
+|---|
+| ![stm32_f7676zi_din_mount.stl](stls/stm32_f7676zi_din_mount.png) 
+
 
 
 ### Sub-assemblies
