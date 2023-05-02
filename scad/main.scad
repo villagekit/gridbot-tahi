@@ -752,37 +752,43 @@ module spindle_plate_dxf() {
     ])
       sheet_2D(spindle_plate_sheet_type, spindle_plate_size[0], spindle_plate_size[1], 3);
 
-    // screw #1
+    // screw: mount to width-axis plate via spacer #1
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #2
+    // screw: mount to width-axis plate via spacer #2
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #3
+    // screw: mount to width-axis plate via spacer #3
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #4
+    // screw: mount to width-axis plate via spacer #4
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #5
+    // screw: mount to width-axis plate via spacer #5
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #6
+    // screw: mount to width-axis plate via spacer #6
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #7
+    // screw: mount to width-axis plate via spacer #7
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #8
+    // screw: mount to width-axis plate via spacer #8
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screws: mount to er20
+    translate([spindle_drill_offset[0], spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length])
+    rotate([0, 0, 90])
+    spindle_er20_bolt_positions()
+      circle(d = spindle_er20_bolt_diameter);
   }
 }
 
@@ -999,5 +1005,7 @@ assembly("main") {
 }
 
 if($preview) {
-  main_assembly();
+  // main_assembly();
+  // spindle_plate_dxf();
+  spindle_assembly();
 }

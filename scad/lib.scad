@@ -292,3 +292,29 @@ module spindle_er20() {
     }
   }
 }
+
+module spindle_er20_bolt_positions() {
+    translate([
+      spindle_er20_bolt_body_offset + (1/2) * spindle_er20_bolt_square_width,
+      (1/2) * spindle_er20_width - spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_bolt_body_offset + (1/2) * spindle_er20_bolt_square_width,
+      -(1/2) * spindle_er20_width + spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_body_length - spindle_er20_bolt_body_offset + (1/2) * spindle_er20_bolt_square_width,
+      (1/2) * spindle_er20_width - spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_body_length - spindle_er20_bolt_body_offset + (1/2) * spindle_er20_bolt_square_width,
+      -(1/2) * spindle_er20_width + spindle_er20_bolt_width_offset,
+    ])
+    children();
+}
