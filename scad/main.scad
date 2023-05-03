@@ -118,7 +118,7 @@ spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
 spindle_motor_NEMA_type = NEMA23_51;
 spindle_plate_size = [
   150,
-  150,
+  200,
 ];
 spindle_offset = [
   width_axis_offset[0],
@@ -789,6 +789,50 @@ module spindle_plate_dxf() {
     rotate([0, 0, 90])
     spindle_er20_bolt_positions()
       circle(d = spindle_er20_bolt_diameter);
+
+    // screws mount to motor mount
+    // https://www.makerstore.com.au/product/nema23-motor-right-angle-mount-plate/
+    translate([
+      5,
+      spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length + 10,
+      0
+    ])
+    union() {
+      union() {
+        hull() {
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([17.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+
+        hull() {
+          translate([37.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([55, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+      }
+
+      translate([0, 30])
+      union() {
+        hull() {
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([17.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+
+        hull() {
+          translate([37.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([55, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+      }
+    }
   }
 }
 
@@ -1005,7 +1049,7 @@ assembly("main") {
 }
 
 if($preview) {
-  // main_assembly();
+  main_assembly();
   // spindle_plate_dxf();
-  spindle_assembly();
+  // spindle_assembly();
 }
