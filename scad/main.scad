@@ -114,11 +114,15 @@ hanpose_hpv6_travel_plate_spacer_height = hanpose_hpv6_height - (extrusion_width
 
 spindle_plate_sheet_type = AL6;
 spindle_plate_spacer_sheet_type = AL6;
-spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
+spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 15];
 spindle_motor_NEMA_type = NEMA23_51;
 spindle_plate_size = [
   150,
-  200,
+  140,
+];
+spindle_plate_offset = [
+  0,
+  22.5,
 ];
 spindle_offset = [
   width_axis_offset[0],
@@ -127,7 +131,7 @@ spindle_offset = [
 ];
 spindle_drill_offset = [
   -40,
-  -50
+  12.5
 ];
 spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_sheet_type) + sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * spindle_er20_height;
 
@@ -746,6 +750,7 @@ module spindle_plate_dxf() {
   dxf("spindle_plate");
 
   difference() {
+    translate(spindle_plate_offset)
     translate([
       0,
       (1/2) * (hanpose_hpv6_travel_plate_size[1] - spindle_plate_size[1]),
@@ -870,12 +875,12 @@ module spindle_assembly()
 assembly("spindle") {
   union() {
     // spacer #1
-    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - 10, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
       render_2D_sheet(spindle_plate_spacer_sheet_type)
       spindle_plate_spacer_dxf();
 
     // spacer #2
-    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
       render_2D_sheet(spindle_plate_spacer_sheet_type)
       spindle_plate_spacer_dxf();
 
