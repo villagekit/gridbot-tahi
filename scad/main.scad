@@ -414,6 +414,12 @@ module length_side_cover_plate_dxf() {
 
     translate([10, 70])
     circle(r = screw_clearance_radius(M5_cap_screw));
+
+    translate([20, 30])
+    circle(r = 6.1);
+
+    translate([20, 50])
+    circle(r = 6.1);
   }
 }
 
