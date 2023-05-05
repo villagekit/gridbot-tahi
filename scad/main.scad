@@ -983,7 +983,7 @@ module stm32_f7676zi_din_mount_stl() {
     [12.70 + 35 * 2.54 + 2.56, -(1/2) * 48.26], // top right
     [12.70 + 35 * 2.54 + 2.56 - 50.80, -(1/2) * 48.26 + 15.24], // middle
   ];
-  stm32_f767zi_hole_spacer_radius = 4;
+  stm32_f767zi_hole_spacer_radius = 3;
   stm32_f767zi_hole_spacer_thickness = 10;
 
   drg_mount(
