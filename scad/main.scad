@@ -966,6 +966,38 @@ module workholding_leg_positions(skip_first = false, skip_last = false) {
   }
 }
 
+// http://www.st.com/resource/en/user_manual/dm00244518.pdf
+// - Mechanical Drawing
+//   - use 2.54mm pin pitch in lieu of other measurements
+module stm32_f7676zi_din_mount_stl() {
+  stl("stm32_f7676zi_din_mount");
+
+  stm32_f767zi_length = 133.34;
+  stm32_f767zi_width = 70.00;
+  mount_thickness = 1;
+  mount_hole_radius = screw_clearance_radius(M3_cap_screw);
+  stm32_f767zi_hole_positions = [
+    [12.70 + 16.51, (1/2) * 45.72],  // bottom left
+    [12.70 + 16.51, -(1/2) * 45.72],  // bottom right
+    [12.70 + 35 * 2.54 + 2 * 2.56, (1/2) * 48.26], // top left ???
+    [12.70 + 35 * 2.54 + 2.56, -(1/2) * 48.26], // top right
+    [12.70 + 35 * 2.54 + 2.56 - 50.80, -(1/2) * 48.26 + 15.24], // middle
+  ];
+  stm32_f767zi_hole_spacer_radius = 3;
+  stm32_f767zi_hole_spacer_thickness = 10;
+
+  drg_mount(
+    drg_01,
+    stm32_f767zi_length,
+    stm32_f767zi_width,
+    mount_thickness,
+    mount_hole_radius,
+    stm32_f767zi_hole_positions,
+    stm32_f767zi_hole_spacer_radius,
+    stm32_f767zi_hole_spacer_thickness
+  );
+}
+
 
 //! Main assembly
 module main_assembly()
@@ -981,8 +1013,18 @@ assembly("main") {
 
   workholding_assembly();
   interconnect_workholding_and_length_axis();
+
+  translate([
+    0,
+    -200,
+    -workholding_leg_height,
+  ])
+  render()
+  stm32_f7676zi_din_mount_stl();
 }
 
 if($preview) {
   main_assembly();
+} else {
+  stm32_f7676zi_din_mount_stl();
 }

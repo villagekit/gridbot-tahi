@@ -34,6 +34,7 @@ include <./joining-plates.scad>;
 include <./l-brackets.scad>;
 include <./rack-and-pinion.scad>;
 include <./spacers.scad>;
+include <./din.scad>;
 
 function ceil_to(value, multiple) = ceil(value / multiple) * multiple;
 
