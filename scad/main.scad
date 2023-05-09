@@ -118,11 +118,11 @@ spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 15];
 spindle_motor_NEMA_type = NEMA23_51;
 spindle_plate_size = [
   150,
-  140,
+  132.5,
 ];
 spindle_plate_offset = [
   0,
-  22.5,
+  35,
 ];
 spindle_offset = [
   width_axis_offset[0],
@@ -803,6 +803,7 @@ module spindle_plate_dxf() {
       0
     ])
     union() {
+      translate([0, 30])
       union() {
         hull() {
           circle(r = screw_clearance_radius(M5_cap_screw));
@@ -820,7 +821,7 @@ module spindle_plate_dxf() {
         }
       }
 
-      translate([0, 30])
+      translate([0, 50])
       union() {
         hull() {
           circle(r = screw_clearance_radius(M5_cap_screw));
@@ -1054,7 +1055,7 @@ assembly("main") {
 }
 
 if($preview) {
-  main_assembly();
+  // main_assembly();
   // spindle_plate_dxf();
-  // spindle_assembly();
+  spindle_assembly();
 }
