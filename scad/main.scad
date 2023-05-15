@@ -1006,55 +1006,56 @@ module stm32_f7676zi_din_mount_stl() {
 
 // https://openbuildspartstore.com/content/DQ542MA%20English%20Manual.pdf
 // - 5. Fixing
-module dq542ma_mount_1_stl() {
-  stl("dq542ma_mount_1");
+module dq542ma_din_mount_stl() {
+  stl("dq542ma_din_mount");
 
-  mount_half_length = 10;
-  mount_width = 0;
+  mount_height = 120;
+  mount_length = 35;
+  mount_width = 75.5;
   mount_thickness = 2;
   mount_hole_radius = screw_clearance_radius(M3_cap_screw);
-  mount_hole_positions = [
-    [13, 10.25],
-    [13, -11.75],
-  ];
+  mount_hole_positions = [];
   mount_hole_spacer_radius = 0;
   mount_hole_spacer_thickness = 0;
 
-  drg_mount_half(
-    drg_01,
-    mount_half_length,
-    mount_width,
-    mount_thickness,
-    mount_hole_radius,
-    mount_hole_positions,
-    mount_hole_spacer_radius,
-    mount_hole_spacer_thickness
-  );
-}
-module dq542ma_mount_2_stl() {
-  stl("dq542ma_mount_2");
+  union() {
+    drg_mount(
+      drg_01,
+      mount_length,
+      mount_width,
+      mount_thickness,
+      mount_hole_radius,
+      mount_hole_positions,
+      mount_hole_spacer_radius,
+      mount_hole_spacer_thickness
+    );
 
-  mount_half_length = 10;
-  mount_width = 0;
-  mount_thickness = 2;
-  mount_hole_radius = screw_clearance_radius(M3_cap_screw);
-  mount_hole_positions = [
-    [13, 11.75],
-    [13, -10.25],
-  ];
-  mount_hole_spacer_radius = 0;
-  mount_hole_spacer_thickness = 0;
+    translate([
+      0,
+      -(1/2) * mount_width + mount_thickness,
+      mount_thickness
+    ])
+    rotate([90, 0, 0])
+    linear_extrude(height = mount_thickness)
+    difference() {
+      square([
+        mount_length,
+        mount_height,
+      ]);
 
-  drg_mount_half(
-    drg_01,
-    mount_half_length,
-    mount_width,
-    mount_thickness,
-    mount_hole_radius,
-    mount_hole_positions,
-    mount_hole_spacer_radius,
-    mount_hole_spacer_thickness
-  );
+      translate([
+        10.5,
+        3,
+      ])
+      circle(r = screw_clearance_radius(M4_cap_screw));
+
+      translate([
+        10.5,
+        3 + 112,
+      ])
+      circle(r = screw_clearance_radius(M4_cap_screw));
+    }
+  }
 }
 
 //! Main assembly
@@ -1083,23 +1084,16 @@ assembly("main") {
 
     render()
     translate([200, 0, 0])
-    dq542ma_mount_1_stl();
-
-    render()
-    translate([240, 0, 0])
-    rotate([0, 0, 180])
-    dq542ma_mount_2_stl();
+    dq542ma_din_mount_stl();
   }
 }
 
 if($preview) {
-  main_assembly();
+  // main_assembly();
+  dq542ma_din_mount_stl();
 } else {
   stm32_f7676zi_din_mount_stl();
 
   translate([200, 0, 0])
-    dq542ma_mount_1_stl();
-
-  translate([240, 0, 0])
-    dq542ma_mount_2_stl();
+    dq542ma_din_mount_stl();
 }
