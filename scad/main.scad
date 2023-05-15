@@ -1004,6 +1004,58 @@ module stm32_f7676zi_din_mount_stl() {
   );
 }
 
+// https://openbuildspartstore.com/content/DQ542MA%20English%20Manual.pdf
+// - 5. Fixing
+module dq542ma_mount_1_stl() {
+  stl("dq542ma_mount_1");
+
+  mount_half_length = 10;
+  mount_width = 0;
+  mount_thickness = 2;
+  mount_hole_radius = screw_clearance_radius(M3_cap_screw);
+  mount_hole_positions = [
+    [13, 10.25],
+    [13, -11.75],
+  ];
+  mount_hole_spacer_radius = 0;
+  mount_hole_spacer_thickness = 0;
+
+  drg_mount_half(
+    drg_01,
+    mount_half_length,
+    mount_width,
+    mount_thickness,
+    mount_hole_radius,
+    mount_hole_positions,
+    mount_hole_spacer_radius,
+    mount_hole_spacer_thickness
+  );
+}
+module dq542ma_mount_2_stl() {
+  stl("dq542ma_mount_2");
+
+  mount_half_length = 10;
+  mount_width = 0;
+  mount_thickness = 2;
+  mount_hole_radius = screw_clearance_radius(M3_cap_screw);
+  mount_hole_positions = [
+    [13, 11.75],
+    [13, -10.25],
+  ];
+  mount_hole_spacer_radius = 0;
+  mount_hole_spacer_thickness = 0;
+
+  drg_mount_half(
+    drg_01,
+    mount_half_length,
+    mount_width,
+    mount_thickness,
+    mount_hole_radius,
+    mount_hole_positions,
+    mount_hole_spacer_radius,
+    mount_hole_spacer_thickness
+  );
+}
 
 //! Main assembly
 module main_assembly()
@@ -1025,12 +1077,29 @@ assembly("main") {
     -200,
     -workholding_leg_height,
   ])
-  render()
-  stm32_f7676zi_din_mount_stl();
+  union() {
+    render()
+    stm32_f7676zi_din_mount_stl();
+
+    render()
+    translate([200, 0, 0])
+    dq542ma_mount_1_stl();
+
+    render()
+    translate([240, 0, 0])
+    rotate([0, 0, 180])
+    dq542ma_mount_2_stl();
+  }
 }
 
 if($preview) {
   main_assembly();
 } else {
   stm32_f7676zi_din_mount_stl();
+
+  translate([200, 0, 0])
+    dq542ma_mount_1_stl();
+
+  translate([240, 0, 0])
+    dq542ma_mount_2_stl();
 }

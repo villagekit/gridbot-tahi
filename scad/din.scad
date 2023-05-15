@@ -69,6 +69,46 @@ module drg_mount(type, mount_length, mount_width, mount_thickness, mount_hole_ra
     }
 }
 
+module drg_mount_half(type, mount_length, mount_width, mount_thickness, mount_hole_radius, mount_hole_positions_list, hole_spacer_radius, hole_spacer_thickness) {
+  width = max(drg_width(type), mount_width);
+
+  translate([
+    -drg_length(type),
+    0,
+  ])
+  union() {
+    linear_extrude(mount_thickness)
+      difference() {
+        translate([
+          0,
+          -(1/2) * width,
+        ])
+        square([
+          drg_length(type) + mount_length,
+          width,
+        ]);
+
+        for (position = mount_hole_positions_list) {
+          translate(position)
+          circle(r = mount_hole_radius);
+        }
+
+        drg_holes(type);
+      }
+
+      linear_extrude(mount_thickness + hole_spacer_thickness)
+      union() {
+        for (position = mount_hole_positions_list) {
+          translate(position)
+          difference() {
+            circle(r = hole_spacer_radius);
+            circle(r = mount_hole_radius);
+          }
+        }
+      }
+    }
+}
+
 module drg_hole_positions(type) {
   for (position = drg_hole_positions_list(type)) {
     translate(position)
