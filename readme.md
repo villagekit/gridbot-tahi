@@ -73,10 +73,9 @@ One spindle, two axis of motion (beam-length and beam-width).
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Stepper motor NEMA22 x 86mm |
 | &nbsp;&nbsp;157&nbsp; | &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;131&nbsp; | &nbsp;&nbsp;54&nbsp; | &nbsp;&nbsp;358&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  |  |  |  |  |  | | **3D printed parts** |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;dq542ma_mount_1.stl |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;dq542ma_mount_2.stl |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;dq542ma_din_mount.stl |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;stm32_f7676zi_din_mount.stl |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;3&nbsp; | &nbsp;&nbsp;3&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
 |  |  |  |  |  |  | | **CNC routed parts** |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;length_axis_bottom_plate.dxf |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;length_axis_motor_side_plate.dxf |
@@ -287,9 +286,9 @@ This assembly is for the axis that will travel along the length of the grid beam
 
 ### 3D Printed parts
 
-| 1 x dq542ma_mount_1.stl | 1 x dq542ma_mount_2.stl | 1 x stm32_f7676zi_din_mount.stl |
-|---|---|---|
-| ![dq542ma_mount_1.stl](stls/dq542ma_mount_1.png) | ![dq542ma_mount_2.stl](stls/dq542ma_mount_2.png) | ![stm32_f7676zi_din_mount.stl](stls/stm32_f7676zi_din_mount.png) 
+| 1 x dq542ma_din_mount.stl | 1 x stm32_f7676zi_din_mount.stl |
+|---|---|
+| ![dq542ma_din_mount.stl](stls/dq542ma_din_mount.png) | ![stm32_f7676zi_din_mount.stl](stls/stm32_f7676zi_din_mount.png) 
 
 
 

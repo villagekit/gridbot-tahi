@@ -1009,7 +1009,7 @@ module stm32_f7676zi_din_mount_stl() {
 module dq542ma_din_mount_stl() {
   stl("dq542ma_din_mount");
 
-  mount_height = 120;
+  mount_height = 118 + 10;
   mount_length = 35;
   mount_width = 75.5;
   mount_thickness = 2;
@@ -1045,13 +1045,13 @@ module dq542ma_din_mount_stl() {
 
       translate([
         10.5,
-        3,
+        5 + 3,
       ])
       circle(r = screw_clearance_radius(M4_cap_screw));
 
       translate([
         10.5,
-        3 + 112,
+        5 + 3 + 112,
       ])
       circle(r = screw_clearance_radius(M4_cap_screw));
     }
