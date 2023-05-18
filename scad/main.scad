@@ -1009,26 +1009,28 @@ module stm32_f7676zi_din_mount_stl() {
 module dq542ma_din_mount_stl() {
   stl("dq542ma_din_mount");
 
-  mount_height = 118 + 10;
+  mount_height = 118 + 5;
   mount_length = 35;
   mount_width = 75.5;
-  mount_thickness = 2;
+  mount_thickness = 3;
   mount_hole_radius = screw_clearance_radius(M3_cap_screw);
   mount_hole_positions = [];
   mount_hole_spacer_radius = 0;
   mount_hole_spacer_thickness = 0;
 
   union() {
-    drg_mount(
-      drg_01,
-      mount_length,
-      mount_width,
-      mount_thickness,
-      mount_hole_radius,
-      mount_hole_positions,
-      mount_hole_spacer_radius,
-      mount_hole_spacer_thickness
-    );
+    difference() {
+      drg_mount(
+        drg_01,
+        mount_length - 2 * drg_length(drg_01),
+        mount_width,
+        mount_thickness,
+        mount_hole_radius,
+        mount_hole_positions,
+        mount_hole_spacer_radius,
+        mount_hole_spacer_thickness
+      );
+    }
 
     translate([
       0,
@@ -1038,22 +1040,32 @@ module dq542ma_din_mount_stl() {
     rotate([90, 0, 0])
     linear_extrude(height = mount_thickness)
     difference() {
+      translate([
+        -drg_length(drg_01),
+        0,
+      ])
       square([
         mount_length,
         mount_height,
       ]);
 
       translate([
-        10.5,
-        5 + 3,
+        -drg_length(drg_01),
+        0,
       ])
-      circle(r = screw_clearance_radius(M4_cap_screw));
+      union() {
+        translate([
+          mount_length - 10.5,
+          2 + 3,
+        ])
+        circle(r = screw_clearance_radius(M4_cap_screw));
 
-      translate([
-        10.5,
-        5 + 3 + 112,
-      ])
-      circle(r = screw_clearance_radius(M4_cap_screw));
+        translate([
+          mount_length - 10.5,
+          2 + 3 + 112,
+        ])
+        circle(r = screw_clearance_radius(M4_cap_screw));
+      }
     }
   }
 }
