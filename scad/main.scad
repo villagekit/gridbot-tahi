@@ -110,15 +110,28 @@ hanpose_hpv6_motor_NEMA_type = NEMA23_51;
 hanpose_hpv6_motor_plate_sheet_type = AL10;
 hanpose_hpv6_motor_coupling_type = SC_635x8_rigid;
 hanpose_hpv6_height = 63;
+hanpose_hpv6_travel_plate_spacer_height = hanpose_hpv6_height - (extrusion_width(hanpose_hpv6_extrusion_type) + carriage_height(hanpose_hpv6_carriage_type) + sheet_thickness(hanpose_hpv6_travel_plate_sheet_type));
 
 spindle_plate_sheet_type = AL6;
 spindle_plate_spacer_sheet_type = AL6;
-spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 20];
+spindle_plate_spacer_size = [hanpose_hpv6_travel_plate_size.x, 15];
 spindle_motor_NEMA_type = NEMA23_51;
+spindle_plate_size = [
+  150,
+  132.5,
+];
+spindle_plate_offset = [
+  0,
+  35,
+];
 spindle_offset = [
   width_axis_offset[0],
   width_axis_offset[1] + (1/2) * (hanpose_hpv6_extrusion_length) + width_axis_plate_offset_y - (1/2) * hanpose_hpv6_rail_length,
   width_axis_offset[2] + sheet_thickness(width_axis_plate_sheet_type) + hanpose_hpv6_height
+];
+spindle_drill_offset = [
+  -40,
+  12.5
 ];
 spindle_drill_point_height = spindle_offset[2] + sheet_thickness(spindle_plate_sheet_type) + sheet_thickness(spindle_plate_spacer_sheet_type) + (1/2) * spindle_er20_height;
 
@@ -687,6 +700,8 @@ assembly("hanpose_hpv6_linear_guide") {
     carriage(length_axis_rail_carriage_type);
 
   // TODO nut block
+  
+  // TODO travel plate spacer
 
   // travel plate
   translate([
@@ -741,39 +756,95 @@ module spindle_plate_dxf() {
   dxf("spindle_plate");
 
   difference() {
-    sheet_2D(hanpose_hpv6_travel_plate_sheet_type, hanpose_hpv6_travel_plate_size[0], hanpose_hpv6_travel_plate_size[1], 3);
+    translate(spindle_plate_offset)
+    translate([
+      0,
+      (1/2) * (hanpose_hpv6_travel_plate_size[1] - spindle_plate_size[1]),
+    ])
+      sheet_2D(spindle_plate_sheet_type, spindle_plate_size[0], spindle_plate_size[1], 3);
 
-    // screw #1
+    // screw: mount to width-axis plate via spacer #1
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #2
+    // screw: mount to width-axis plate via spacer #2
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #3
+    // screw: mount to width-axis plate via spacer #3
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #4
+    // screw: mount to width-axis plate via spacer #4
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, (1/2) * hanpose_hpv6_travel_plate_size.y - 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #5
+    // screw: mount to width-axis plate via spacer #5
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #6
+    // screw: mount to width-axis plate via spacer #6
     translate([(1/2) * hanpose_hpv6_travel_plate_size.x - 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #7
+    // screw: mount to width-axis plate via spacer #7
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 30, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
 
-    // screw #8
+    // screw: mount to width-axis plate via spacer #8
     translate([-(1/2) * hanpose_hpv6_travel_plate_size.x + 10, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10])
       circle(r = screw_clearance_radius(M5_cap_screw));
+
+    // screws: mount to er20
+    translate([spindle_drill_offset[0], spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length])
+    rotate([0, 0, 90])
+    spindle_er20_bolt_positions()
+      circle(d = spindle_er20_bolt_diameter);
+
+    // screws mount to motor mount
+    // https://www.makerstore.com.au/product/nema23-motor-right-angle-mount-plate/
+    translate([
+      5,
+      spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length + 10,
+      0
+    ])
+    union() {
+      translate([0, 30])
+      union() {
+        hull() {
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([17.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+
+        hull() {
+          translate([37.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([55, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+      }
+
+      translate([0, 50])
+      union() {
+        hull() {
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([17.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+
+        hull() {
+          translate([37.5, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+
+          translate([55, 0])
+          circle(r = screw_clearance_radius(M5_cap_screw));
+        }
+      }
+    }
   }
 }
 
@@ -811,12 +882,12 @@ module spindle_assembly()
 assembly("spindle") {
   union() {
     // spacer #1
-    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+    translate([0, (1/2) * hanpose_hpv6_travel_plate_size.y - 10, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
       render_2D_sheet(spindle_plate_spacer_sheet_type)
       spindle_plate_spacer_dxf();
 
     // spacer #2
-    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + (1/2) * spindle_plate_spacer_size.y, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
+    translate([0, -(1/2) * hanpose_hpv6_travel_plate_size.y + 10, (1/2) * sheet_thickness(spindle_plate_spacer_sheet_type)])
       render_2D_sheet(spindle_plate_spacer_sheet_type)
       spindle_plate_spacer_dxf();
 
@@ -826,7 +897,7 @@ assembly("spindle") {
       spindle_plate_dxf();
 
     // spindle
-    translate([0, -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
+    translate([spindle_drill_offset[0], spindle_drill_offset[1] + -(1/2) * spindle_er20_body_length, sheet_thickness(spindle_plate_spacer_sheet_type) + sheet_thickness(spindle_plate_sheet_type)])
       rotate([0, 0, 90])
       spindle_er20();
   }
@@ -1030,7 +1101,9 @@ assembly("main") {
 }
 
 if($preview) {
-  main_assembly();
+  // main_assembly();
+  // spindle_plate_dxf();
+  spindle_assembly();
 } else {
   stm32_f7676zi_din_mount_stl();
 }

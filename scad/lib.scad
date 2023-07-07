@@ -186,6 +186,13 @@ spindle_er20_collet_length = 42.5;
 spindle_er20_collet_diameter = 30;
 spindle_er20_shaft_length = spindle_er20_total_length - spindle_er20_body_length - spindle_er20_collet_length;
 spindle_er20_shaft_diameter = 14;
+spindle_er20_bolt_diameter = 9;
+spindle_er20_bolt_height = 53;
+spindle_er20_bolt_body_offset_1 = 76.5 - 42.5;
+spindle_er20_bolt_body_offset_2 = spindle_er20_bolt_body_offset_1 + 95;
+spindle_er20_bolt_square_width = 15;
+spindle_er20_bolt_square_cutout_height = spindle_er20_height - spindle_er20_bolt_height;
+spindle_er20_bolt_width_offset = 7.5;
 
 // https://www.aliexpress.com/item/1005001278002287.html
 module spindle_er20() {
@@ -196,7 +203,76 @@ module spindle_er20() {
       // body
       color("#066E06")
       translate([0, -(1/2) * spindle_er20_width, 0])
-        rounded_cube_yz([spindle_er20_body_length, spindle_er20_width, spindle_er20_height], r = 10);
+      difference() {
+        union() {
+          // body main
+          rounded_cube_yz([spindle_er20_body_length, spindle_er20_width, spindle_er20_height], r = 10);
+
+          // (1/4) bolt square
+          translate([spindle_er20_bolt_body_offset_1, spindle_er20_width - (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_height - spindle_er20_bolt_square_cutout_height]);
+
+          // (2/4) bolt square
+          translate([spindle_er20_bolt_body_offset_2, spindle_er20_width - (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_height - spindle_er20_bolt_square_cutout_height]);
+
+          // (3/4) bolt square
+          translate([spindle_er20_bolt_body_offset_1, (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_height - spindle_er20_bolt_square_cutout_height]);
+
+          // (4/4) bolt square
+          translate([spindle_er20_bolt_body_offset_2, (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_height - spindle_er20_bolt_square_cutout_height]);
+        };
+
+        // (1/4)
+        translate([spindle_er20_bolt_body_offset_1, spindle_er20_width - (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+        union () {
+          // bolt square cutout
+          translate([0, 0, spindle_er20_height - spindle_er20_bolt_square_cutout_height])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_bolt_square_cutout_height + eps]);
+
+          // bolt
+          translate([(1/2) * spindle_er20_bolt_square_width, (1/2) * spindle_er20_bolt_square_width, -eps])
+          cylinder(d = spindle_er20_bolt_diameter, h = spindle_er20_bolt_height + 2 * eps);
+        }
+
+        // (2/4)
+        translate([spindle_er20_bolt_body_offset_2, spindle_er20_width - (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+        union () {
+          // bolt square cutout
+          translate([0, 0, spindle_er20_height - spindle_er20_bolt_square_cutout_height])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_bolt_square_cutout_height + eps]);
+
+          // bolt
+          translate([(1/2) * spindle_er20_bolt_square_width, (1/2) * spindle_er20_bolt_square_width, -eps])
+          cylinder(d = spindle_er20_bolt_diameter, h = spindle_er20_bolt_height + 2 * eps);
+        }
+
+        // (3/4)
+        translate([spindle_er20_bolt_body_offset_1, (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+        union () {
+          // bolt square cutout
+          translate([0, 0, spindle_er20_height - spindle_er20_bolt_square_cutout_height])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_bolt_square_cutout_height + eps]);
+
+          // bolt
+          translate([(1/2) * spindle_er20_bolt_square_width, (1/2) * spindle_er20_bolt_square_width, -eps])
+          cylinder(d = spindle_er20_bolt_diameter, h = spindle_er20_bolt_height + 2 * eps);
+        }
+
+        // (4/4)
+        translate([spindle_er20_bolt_body_offset_2, (1/2) * spindle_er20_bolt_square_width - spindle_er20_bolt_width_offset, 0])
+        union () {
+          // bolt square cutout
+          translate([0, 0, spindle_er20_height - spindle_er20_bolt_square_cutout_height])
+          cube([spindle_er20_bolt_square_width, spindle_er20_bolt_square_width, spindle_er20_bolt_square_cutout_height + eps]);
+
+          // bolt
+          translate([(1/2) * spindle_er20_bolt_square_width, (1/2) * spindle_er20_bolt_square_width, -eps])
+          cylinder(d = spindle_er20_bolt_diameter, h = spindle_er20_bolt_height + 2 * eps);
+        }
+      };
 
       // shaft
       color("#919191")
@@ -217,4 +293,30 @@ module spindle_er20() {
         cylinder(d = spindle_er20_collet_diameter, h = (1/2) * spindle_er20_collet_length);
     }
   }
+}
+
+module spindle_er20_bolt_positions() {
+    translate([
+      spindle_er20_bolt_body_offset_1 + (1/2) * spindle_er20_bolt_square_width,
+      (1/2) * spindle_er20_width - spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_bolt_body_offset_1 + (1/2) * spindle_er20_bolt_square_width,
+      -(1/2) * spindle_er20_width + spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_bolt_body_offset_2 + (1/2) * spindle_er20_bolt_square_width,
+      (1/2) * spindle_er20_width - spindle_er20_bolt_width_offset,
+    ])
+    children();
+
+    translate([
+      spindle_er20_bolt_body_offset_2 + (1/2) * spindle_er20_bolt_square_width,
+      -(1/2) * spindle_er20_width + spindle_er20_bolt_width_offset,
+    ])
+    children();
 }
